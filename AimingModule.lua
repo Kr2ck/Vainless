@@ -56,7 +56,7 @@ local AimingSettings = {
 
     TracerSettings = {
         Tracer = Drawingnew("Line"),
-        Enabled = true,
+        Enabled = false,
         Colour = Color3fromRGB(138, 53, 222)
     },
 

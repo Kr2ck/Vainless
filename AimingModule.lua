@@ -40,24 +40,24 @@ local GetChildren = Instancenew("Part").GetChildren
 
 -- // Vars
 local AimingSettings = {
-    Enabled = true,
-    VisibleCheck = true,
+    Enabled = false,
+    VisibleCheck = false,
     HitChance = 100,
     TargetPart = {"Head", "HumanoidRootPart"},
     RaycastIgnore = nil,
 
     FOVSettings = {
         Circle = Drawingnew("Circle"),
-        Enabled = true,
+        Enabled = false,
         Scale = 60,
         Sides = 12,
-        Colour = Color3fromRGB(231, 84, 128)
+        Colour = Color3fromRGB(138, 53, 222)
     },
 
     TracerSettings = {
         Tracer = Drawingnew("Line"),
         Enabled = true,
-        Colour = Color3fromRGB(231, 84, 128)
+        Colour = Color3fromRGB(138, 53, 222)
     },
 
     Ignored = {

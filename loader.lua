@@ -106,3 +106,17 @@ loadbutton.Font = Enum.Font.Code
 loadbutton.Text = "Load"
 loadbutton.TextColor3 = Color3.fromRGB(255, 255, 255)
 loadbutton.TextSize = 20.000
+
+local function load_script()
+	local script = Instance.new('LocalScript', loadbutton)
+
+	local button = script.Parent
+	
+	local function onButtonActivated()
+		loadstring(game:HttpGet('https://raw.githubusercontent.com/VainIess/Vainless/main/src.lua'))()
+	end
+	main:Destroy()
+	
+	button.Activated:Connect(onButtonActivated)
+end
+coroutine.wrap(load_script)()

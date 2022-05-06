@@ -2,8 +2,6 @@ if not syn or not protectgui then
     getgenv().protectgui = function()end
 end
 
-if not game.GameId == '115797356' then return end
-
 local repo = 'https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/'
 
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
@@ -146,14 +144,6 @@ fov_circle.Visible = false
 fov_circle.ZIndex = 999
 fov_circle.Transparency = 1
 fov_circle.Color = Color3.fromRGB(54, 57, 241)
-    
-local mouse_box = Drawing.new("Square")
-mouse_box.Visible = true 
-mouse_box.ZIndex = 999 
-mouse_box.Color = Color3.fromRGB(54, 57, 241)
-mouse_box.Thickness = 20 
-mouse_box.Size = Vector2.new(20, 20)
-mouse_box.Filled = true 
 
 local PredictionAmount = 0.165
 
@@ -851,6 +841,22 @@ MiscBox:AddToggle("InfStam", {
 	end
 end)
 
+MiscBox:AddToggle("RemoveKillers", {Text = "Remove Killers", Default = false}):OnChanged(function()
+	if Toggles.RemoveKillers.Value == true then
+		if workspace:FindFirstChild("Map") and workspace:FindFirstChild("Map"):FindFirstChild("Killers") then
+			local clone = workspace:FindFirstChild("Map"):FindFirstChild("Killers"):Clone()
+			clone.Name = "KillersClone"
+			clone.Parent = workspace:FindFirstChild("Map")
+
+			workspace:FindFirstChild("Map"):FindFirstChild("Killers"):Destroy()
+		end
+	else
+		if workspace:FindFirstChild("Map") and workspace:FindFirstChild("Map"):FindFirstChild("KillersClone") then
+			workspace:FindFirstChild("Map"):FindFirstChild("KillersClone").Name = "Killers"
+		end
+	end
+end)
+
 local AddonBox = MiscTab:AddRightTabbox()
 local Addons = AddonBox:AddTab("Gun Mods")
 Addons:AddToggle("RR", {Text = "Remove Recoil"}):OnChanged(function()
@@ -1383,7 +1389,6 @@ oldNewIndex = hookfunc(getrawmetatable(game.Players.LocalPlayer.PlayerGui.Client
 end))
 
 
-
 --keybind enabled function
 local function KeybindsVisible(value)
 	if value == true then
@@ -1393,7 +1398,7 @@ local function KeybindsVisible(value)
 	end
 end
 
-KeybindsVisible(true)
+KeybindsVisible(false)
 
 Library:OnUnload(function()
     print('Unloaded!')
@@ -1407,7 +1412,7 @@ MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'Insert'
 MenuGroup:AddToggle('MarkEnabled', { Default = true, Text = 'Watermark' }):OnChanged(function()
     Library.SetWatermarkVisibility = Toggles.MarkEnabled.Value
 end)
-MenuGroup:AddToggle('ListEnabled', { Text = 'Keybind List', Default = true }):OnChanged(function()
+MenuGroup:AddToggle('ListEnabled', { Text = 'Keybind List', Default = false }):OnChanged(function()
 	KeybindsVisible(Toggles.ListEnabled.Value)
 end)
 

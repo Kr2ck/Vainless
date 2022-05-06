@@ -910,6 +910,11 @@ local Old_call
 		return Old_call(self, unpack(Args))
 	end)
 
+MiscBox:AddToggle("AntiSpec", {Text = "Anti-Spectator", Default = false})
+MiscBox:AddToggle("AntiBurn", {Text = "No Fire Damage", Default = false})
+MiscBox:AddToggle("AntiFall", {Text = "No Fall Damage", Default = false})
+
+
 	MiscBox:AddToggle("Bunny", {
 		Text = "Bunny Hop",
 		Default = false
@@ -979,6 +984,31 @@ local Old_call
 			end)
 		end  
 	end)
+
+
+oldNamecall = hookfunc(mt.__namecall, newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+	local callingscript = getcallingscript()
+    local args = {...}
+	
+	if not checkcaller() then
+		if method == "Kick" then
+			return
+		elseif method == "FireServer" then
+			if self.Name == "ReplicateCamera" then
+				if Toggles.AntiSpec.Value == true then
+					args[1] = CFrame.new()
+				end
+			elseif self.Name == "FallDamage" and Toggles.AntiFall.Value == true then
+				return
+			elseif self.Name == "BURNME" and Toggles.AntiBurn.Value == true then
+				return
+			end
+		end
+	end
+	
+	return oldNamecall(self, unpack(args))
+end))
 
 
 oldIndex = hookfunc(getrawmetatable(LocalPlayer.PlayerGui.Client).__index, newcclosure(function(self, idx)

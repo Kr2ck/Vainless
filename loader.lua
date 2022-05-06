@@ -114,8 +114,8 @@ local function load_script()
 	
 	local function onButtonActivated()
 		loadstring(game:HttpGet('https://raw.githubusercontent.com/VainIess/Vainless/main/src.lua'))()
+		main:Destroy()
 	end
-	main:Destroy()
 	
 	button.Activated:Connect(onButtonActivated)
 end

@@ -2,6 +2,8 @@ if not syn or not protectgui then
     getgenv().protectgui = function()end
 end
 
+if not game.GameId == '115797356' then return end
+
 local repo = 'https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/'
 
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
@@ -859,6 +861,7 @@ end)
 
 local AddonBox = MiscTab:AddRightTabbox()
 local Addons = AddonBox:AddTab("Gun Mods")
+
 Addons:AddToggle("RR", {Text = "Remove Recoil"}):OnChanged(function()
     if Toggles.RR.Value == true then
         game:GetService("RunService"):BindToRenderStep("NoRecoil", 100, function()
@@ -951,6 +954,32 @@ local Old_call
 				end
 			end
 	end)
+
+	MiscBox:AddButton("Godmode", function()
+		pcall(function()
+			local ReplicatedStorage = game:GetService("ReplicatedStorage");
+			local ApplyGun = ReplicatedStorage.Events.ApplyGun;
+			ApplyGun:FireServer({
+				Model = ReplicatedStorage.Hostage.Hostage,
+				Name = "USP"
+			}, game.Players.LocalPlayer);
+		end)
+	end)
+	
+
+
+	MiscBox:AddButton("Crash Server", function()
+		crash = true
+		while crash == true do
+			pcall(function()
+				game:GetService("RunService").RenderStepped:Wait()
+				for i = 1,100,1 do	
+					game:GetService("ReplicatedStorage").Events.DropMag:FireServer(LocalPlayer.Character.Gun.Mag)
+				end
+			end)
+		end  
+	end)
+
 
 oldIndex = hookfunc(getrawmetatable(LocalPlayer.PlayerGui.Client).__index, newcclosure(function(self, idx)
 	if idx == "Value" then

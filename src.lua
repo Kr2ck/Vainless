@@ -801,6 +801,18 @@ ReplicatedStorage.Events.SendMsg.OnClientEvent:Connect(function(message)
 	end
 end)
 
+MiscBox:AddToggle("RemoveHead", {Text = "Remove Head", Default = false}):OnChanged(function()
+	if Toggles.RemoveHead.Value == true then
+		if LocalPlayer.Character:FindFirstChild("FakeHead") then
+			LocalPlayer.Character.FakeHead:Destroy()
+		end
+		if LocalPlayer.Character:FindFirstChild("HeadHB") then
+			LocalPlayer.Character.HeadHB:Destroy()
+		end
+	end
+end)
+
+
 MiscBox:AddToggle("InfAmmo", {
     Text = "Infinite Ammo",
     Default = false
@@ -1360,6 +1372,26 @@ VBox:AddSlider("ZView", {Text = "Viewmodel Z", Default = 0, Min = 0, Max = 360, 
 	ViewmodelZ = Options.ZView.Value
 end)
 
+VBox:AddToggle("EnableFOV", {Text = "Override FOV", Default = false})
+
+VBox:AddSlider("ViewFOV", {Text = "FOV", Default = 80, Min = 0, Max = 120, Rounding = 0})
+
+Toggles.EnableFOV:OnChanged(function()
+	if Toggles.EnableFOV.Value == true then
+		cbClient.fieldofview = Options.ViewFOV.Value
+		workspace.CurrentCamera.FieldOfView = Options.ViewFOV.Value
+	else 
+		cbClient.fieldofview = 80
+		workspace.CurrentCamera.FieldOfView = 80
+		end
+end)
+
+VBox:AddButton("Reset FOV", function()
+	Options.ViewFOV:SetValue(80)
+	cbClient.fieldofview = 80
+	workspace.CurrentCamera.FieldOfView = 80
+end)
+
 local mt = getrawmetatable(game)
 local oldNamecall = mt.__namecall
 
@@ -1482,10 +1514,8 @@ SaveManager:SetLibrary(Library)
 
 SaveManager:IgnoreThemeSettings() 
 
-SaveManager:SetIgnoreIndexes({ 'MenuKeybind' }) 
-
-ThemeManager:SetFolder('Vainless/Themes')
-SaveManager:SetFolder('Vainless/CBRO')
+ThemeManager:SetFolder('Vainless/')
+SaveManager:SetFolder('Vainless/')
 
 SaveManager:BuildConfigSection(SettingsTab) 
 

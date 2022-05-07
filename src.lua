@@ -1372,18 +1372,9 @@ VBox:AddSlider("ZView", {Text = "Viewmodel Z", Default = 0, Min = 0, Max = 360, 
 	ViewmodelZ = Options.ZView.Value
 end)
 
-VBox:AddToggle("EnableFOV", {Text = "Override FOV", Default = false})
-
-VBox:AddSlider("ViewFOV", {Text = "FOV", Default = 80, Min = 0, Max = 120, Rounding = 0})
-
-Toggles.EnableFOV:OnChanged(function()
-	if Toggles.EnableFOV.Value == true then
-		cbClient.fieldofview = Options.ViewFOV.Value
-		workspace.CurrentCamera.FieldOfView = Options.ViewFOV.Value
-	else 
-		cbClient.fieldofview = 80
-		workspace.CurrentCamera.FieldOfView = 80
-		end
+VBox:AddSlider("ViewFOV", {Text = "Field Of View", Default = 80, Min = 0, Max = 120, Rounding = 0}):OnChanged(function()
+	cbClient.fieldofview = Options.ViewFOV.Value
+	workspace.CurrentCamera.FieldOfView = Options.ViewFOV.Value
 end)
 
 VBox:AddButton("Reset FOV", function()

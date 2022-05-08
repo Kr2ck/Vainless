@@ -114,6 +114,105 @@ local function getClosestPlayer()
     return Closest
 end
 
+Skyboxes = {
+    ["Purple Nebula"] = {
+        ["SkyboxBk"] = "rbxassetid://159454299",
+        ["SkyboxDn"] = "rbxassetid://159454296",
+        ["SkyboxFt"] = "rbxassetid://159454293",
+        ["SkyboxLf"] = "rbxassetid://159454286",
+        ["SkyboxRt"] = "rbxassetid://159454300",
+        ["SkyboxUp"] = "rbxassetid://159454288"
+    },
+    ["Neptune"] = {
+        ["SkyboxBk"] = "rbxassetid://218955819",
+        ["SkyboxDn"] = "rbxassetid://218953419",
+        ["SkyboxFt"] = "rbxassetid://218954524",
+        ["SkyboxLf"] = "rbxassetid://218958493",
+        ["SkyboxRt"] = "rbxassetid://218957134",
+        ["SkyboxUp"] = "rbxassetid://218950090"
+    },
+    ["Red Night"] = {
+        ["SkyboxBk"] = "rbxassetid://401664839",
+        ["SkyboxDn"] = "rbxassetid://401664862",
+        ["SkyboxFt"] = "rbxassetid://401664960",
+        ["SkyboxLf"] = "rbxassetid://401664881",
+        ["SkyboxRt"] = "rbxassetid://401664901",
+        ["SkyboxUp"] = "rbxassetid://401664936"
+    },
+    ["Dusty Clouds"] = {
+        ["SkyboxBk"] = "rbxassetid://252760981",
+        ["SkyboxDn"] = "rbxassetid://252763035",
+        ["SkyboxFt"] = "rbxassetid://252761439",
+        ["SkyboxLf"] = "rbxassetid://252760980",
+        ["SkyboxRt"] = "rbxassetid://252760986",
+        ["SkyboxUp"] = "rbxassetid://252762652"
+    },
+    ["Space"] = {
+        ["SkyboxBk"] = "rbxassetid://7950829832",
+        ["SkyboxDn"] = "rbxassetid://7950831534",
+        ["SkyboxFt"] = "rbxassetid://7950834733",
+        ["SkyboxLf"] = "rbxassetid://7950836475",
+        ["SkyboxRt"] = "rbxassetid://7950838302",
+        ["SkyboxUp"] = "rbxassetid://7950839880"
+    },
+    ["Mountains"] = {
+        ["SkyboxBk"] = "rbxassetid://7950695993",
+        ["SkyboxDn"] = "rbxassetid://7950763494",
+        ["SkyboxFt"] = "rbxassetid://7950698655",
+        ["SkyboxLf"] = "rbxassetid://7950700557",
+        ["SkyboxRt"] = "rbxassetid://7950702581",
+        ["SkyboxUp"] = "rbxassetid://7950704792"
+    },
+    ["Elegant Morning"] = {
+        ["SkyboxBk"] = "rbxassetid://153767241",
+        ["SkyboxDn"] = "rbxassetid://153767216",
+        ["SkyboxFt"] = "rbxassetid://153767266",
+        ["SkyboxLf"] = "rbxassetid://153767200",
+        ["SkyboxRt"] = "rbxassetid://153767231",
+        ["SkyboxUp"] = "rbxassetid://153767288"
+    },
+    ["Midnight"] = {
+        ["SkyboxBk"] = "rbxassetid://7950569153",
+        ["SkyboxDn"] = "rbxassetid://7950570785",
+        ["SkyboxFt"] = "rbxassetid://7950572449",
+        ["SkyboxLf"] = "rbxassetid://7950573918",
+        ["SkyboxRt"] = "rbxassetid://7950575055",
+        ["SkyboxUp"] = "rbxassetid://7950627627"
+    },
+    ["Evening"] = {
+        ["SkyboxBk"] = "rbxassetid://7952563158",
+        ["SkyboxDn"] = "rbxassetid://7952585178",
+        ["SkyboxFt"] = "rbxassetid://7952565520",
+        ["SkyboxLf"] = "rbxassetid://7952566551",
+        ["SkyboxRt"] = "rbxassetid://7952570003",
+        ["SkyboxUp"] = "rbxassetid://7952571101"
+    },
+    ["Anime"] = {
+        ["SkyboxBk"] = "rbxassetid://7957643729",
+        ["SkyboxDn"] = "rbxassetid://7957646433",
+        ["SkyboxFt"] = "rbxassetid://7957649146",
+        ["SkyboxLf"] = "rbxassetid://7957650496",
+        ["SkyboxRt"] = "rbxassetid://7957652494",
+        ["SkyboxUp"] = "rbxassetid://7957654560"
+    },
+    ["Fade Blue"] = {
+        ["SkyboxBk"] = "rbxassetid://153695414",
+        ["SkyboxDn"] = "rbxassetid://153695352",
+        ["SkyboxFt"] = "rbxassetid://153695452",
+        ["SkyboxLf"] = "rbxassetid://153695320",
+        ["SkyboxRt"] = "rbxassetid://153695383",
+        ["SkyboxUp"] = "rbxassetid://153695471"
+    },
+    ["Pink Daylight"] = {
+        ["SkyboxBk"] = "rbxassetid://271042516",
+        ["SkyboxDn"] = "rbxassetid://271077243",
+        ["SkyboxFt"] = "rbxassetid://271042556",
+        ["SkyboxLf"] = "rbxassetid://271042310",
+        ["SkyboxRt"] = "rbxassetid://271042467",
+        ["SkyboxUp"] = "rbxassetid://271077958"
+    }
+}
+
 local Window = Library:CreateWindow({
     Title = 'Vainless.xyz',
     Center = true, 
@@ -927,6 +1026,7 @@ MiscBox:AddToggle("AntiBurn", {Text = "No Fire Damage", Default = false})
 MiscBox:AddToggle("AntiFall", {Text = "No Fall Damage", Default = false})
 
 
+
 	MiscBox:AddToggle("Bunny", {
 		Text = "Bunny Hop",
 		Default = false
@@ -971,6 +1071,7 @@ MiscBox:AddToggle("AntiFall", {Text = "No Fall Damage", Default = false})
 				end
 			end
 	end)
+	
 
 	MiscBox:AddButton("Godmode", function()
 		pcall(function()
@@ -996,6 +1097,17 @@ MiscBox:AddToggle("AntiFall", {Text = "No Fall Damage", Default = false})
 			end)
 		end  
 	end)
+
+	MiscBox:AddButton("Rejoin Server", function()
+		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+	end)
+
+	
+	MiscBox:AddButton("Copy Roblox Game Invite", function()
+		setclipboard("Roblox.GameLauncher.joinGameInstance("..game.PlaceId..", '"..game.JobId.."')")
+	end)
+
+
 
 
 oldNamecall = hookfunc(mt.__namecall, newcclosure(function(self, ...)
@@ -1139,48 +1251,143 @@ VisBox:AddToggle("ShowWeapons", {Text = "Show Weapons", Default = false}):OnChan
     Settings.ESP.Gun = Toggles.ShowWeapons.Value
 end)
 
-VisBox:AddToggle("ChamsOn", {Text = "Chams", Default = false}):AddColorPicker("CColor", {Default = Color3.fromRGB(255,255,255)})
 
-VisBox:AddSlider("Transparency", {Text = "Transparency", Default = 0.5, Min = 0, Max = 1, Rounding = 2})
-
-Toggles.ChamsOn:OnChanged(function()
-	Settings.ESP.Chams = Toggles.ChamsOn.Value
-	if Settings.ESP.Chams == true then
-        function chamgui(name,parent,face)
-            local SG = Instance.new("SurfaceGui",parent)
-            SG.Parent = parent
-            SG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-            SG.Face = Enum.NormalId[face]
-            SG.LightInfluence = 0
-            SG.ResetOnSpawn = false
-            SG.Name = name
-            SG.AlwaysOnTop = true
-            local Frame = Instance.new("Frame", SG)
-            Frame.BackgroundColor3 = Options.CColor.Value
-            Frame.Size = UDim2.new(1,0,1,0)
-            Frame.Transparency = Options.Transparency.Value
-        end
-        local players = game:GetService('Players')
-        local player = players.LocalPlayer
-        while wait(1) do
-            for i,v in pairs (game:GetService("Players"):GetPlayers()) do
-                if v ~= game:GetService("Players").LocalPlayer and v.Character ~= nil and v.Character:FindFirstChild("Head") and v.Character.Head:FindFirstChild("cham") == nil and v.TeamColor ~= player.TeamColor then --Change these later maybe if you want
-                    for i,v in pairs (v.Character:GetChildren()) do
-                        if v:IsA("MeshPart") or v.Name == "Head" then
-                            chamgui("cham",v,"Back")
-                            chamgui("cham",v,"Front")
-                            chamgui("cham",v,"Left")
-                            chamgui("cham",v,"Right")
-                            chamgui("cham",v,"Top")
-                            chamgui("cham",v,"Bottom")
+local ap = Instance.new("Folder", game.CoreGui)
+function chams(aq)
+    pcall(
+        function()
+            if aq.Character then
+                for B, C in next, aq.Character:GetChildren() do
+                    if C:IsA "BasePart" and C.Name ~= "HumanoidRootPart" then
+                        local ar = Instance.new("BoxHandleAdornment")
+                        ar.Size = C.Size + Vector3.new(0.1, 0.1, 0.1)
+                        ar.Transparency = Options.CTransparency.Value / 100
+                        ar.ZIndex = 0
+                        ar.AlwaysOnTop = true
+                        ar.Visible = true
+                        ar.Parent = ap
+                        ar.Adornee = C
+                        ar.Color3 = Options.CColor.Value
+                        if aq.Character:FindFirstChild("HumanoidRootPart") then
+                            aq.Character.HumanoidRootPart.AncestryChanged:connect(
+                                function()
+                                    ar:Destroy()
+                                end
+                            )
                         end
                     end
                 end
             end
         end
+    )
+end
+local ap = Instance.new("Folder", game.CoreGui)
+function chams(aq)
+    pcall(
+        function()
+            if aq.Character then
+                for B, C in next, aq.Character:GetChildren() do
+                    if C:IsA "BasePart" and C.Name ~= "HumanoidRootPart" then
+                        local ar = Instance.new("BoxHandleAdornment")
+                        ar.Size = C.Size + Vector3.new(0.1, 0.1, 0.1)
+                        ar.Transparency = Options.CTransparency.Value / 100
+                        ar.ZIndex = 0
+                        ar.AlwaysOnTop = true
+                        ar.Visible = true
+                        ar.Parent = ap
+                        ar.Adornee = C
+                        ar.Color3 = Options.CColor.Value
+                        if aq.Character:FindFirstChild("HumanoidRootPart") then
+                            aq.Character.HumanoidRootPart.AncestryChanged:connect(
+                                function()
+                                    ar:Destroy()
+                                end
+                            )
+                        end
+                    end
+                end
+            end
+        end
+    )
+end
 
+
+
+
+
+
+VisBox:AddToggle("ChamsOn", {Text = "Chams", Default = false}):AddColorPicker("CColor", {Default = Color3.fromRGB(255,255,255)})
+
+VisBox:AddSlider("CTransparency", {Text = "Transparency", Default = 50, Min = 0, Max = 100, Rounding = 0})
+
+Toggles.ChamsOn:OnChanged(function()
+	if Toggles.ChamsOn.Value == true then
+        for B, C in next, Players:GetPlayers() do
+            if C ~= LocalPlayer and C.Team ~= LocalPlayer.Team and C.Character and C.Character.PrimaryPart then
+                chams(C)
+            end
+        end
+    else
+        ap:ClearAllChildren()
     end
 end)
+
+Options.CTransparency:OnChanged(function()
+    for B, C in next, ap:GetChildren() do
+        C.Transparency = 0 + Options.CTransparency.Value / 100
+    end
+end)
+
+Options.CColor:OnChanged(function()
+	for B, C in next, ap:GetChildren() do
+		C.Color3 = Options.CColor.Value
+	end
+end)
+
+for B, C in next, Players:GetPlayers() do
+    C.CharacterAdded:Connect(
+        function(aq)
+            wait(1)
+            if C ~= LocalPlayer and LocalPlayer.Team ~= C.Team and Toggles.ChamsOn.Value == true then
+                chams(C)
+            end
+        end
+    )
+end
+Players.PlayerAdded:Connect(
+    function(C)
+        C.CharacterAdded:Connect(
+            function(aq)
+                wait(1)
+                if C ~= LocalPlayer and C.Team ~= LocalPlayer.Team and Toggles.ChamsOn.Value == true then
+                    chams(C)
+                end
+            end
+        )
+    end
+)
+for B, C in next, game.Teams:GetChildren() do
+    C.PlayerAdded:connect(
+        function(aq)
+            if aq == LocalPlayer then
+                ap:ClearAllChildren()
+                wait(0.5)
+                if Toggles.ChamsOn.Value == true then
+                    for B, C in next, Players:GetPlayers() do
+                        if
+                            C ~= LocalPlayer and C.Team ~= LocalPlayer.Team and C.Character and C.Character:FindFirstChild("Humanoid") and
+                                C.Character.Humanoid.Health > 0
+                         then
+                            chams(C)
+                        end
+                    end
+                end
+            end
+        end
+    )
+end
+
+
 
 
 
@@ -1461,6 +1668,43 @@ end)
 
 VissBox:AddToggle("ForceCH", {Text = "Force CrossHair", Default = false})
 
+local cworld = Instance.new("ColorCorrectionEffect", workspace.CurrentCamera)
+VissBox:AddToggle("ColorWorld", {Text = "Colorful World", Default = false}):OnChanged(function()
+	if Toggles.ColorWorld.Value == true then
+        cworld.Saturation = 1.2
+    elseif Toggles.ColorWorld.Value == false then
+        cworld.Saturation = 0
+    end
+end)
+
+local correction = Instance.new("ColorCorrectionEffect", game.Lighting)
+VissBox:AddToggle("NightMode", {Text = "NightMode", Default = false}):OnChanged(function()
+	if Toggles.NightMode.Value == true then
+        correction.Brightness = -0.15
+        game.Lighting.Brightness = 0
+    else
+        correction.Brightness = 0
+        game.Lighting.Brightness = 1
+    end
+end)
+
+VissBox:AddToggle("BetterShadows", {Text = "Better Shadows", Default = false})
+
+game:GetService("RunService").Stepped:connect(function()
+	pcall(
+            function()
+                if game.Lighting:FindFirstChild("SunRays") then
+                    game.Lighting.SunRays.Intensity = Toggles.NightMode.Value and 0 or 0.11
+                end
+                game.Lighting.TimeOfDay = Toggles.NightMode.Value and 17 or 14
+                if Toggles.BetterShadows.Value == true then
+                    game.Lighting.GlobalShadows = true
+                else
+                    game.Lighting.GlobalShadows = false
+                end
+			end)
+end)
+
 oldNewIndex = hookfunc(getrawmetatable(game.Players.LocalPlayer.PlayerGui.Client).__newindex, newcclosure(function(self, idx, val)
 	if not checkcaller() then
 			if self.Name == "Crosshair" and idx == "Visible" and val == false and LocalPlayer.PlayerGui.GUI.Crosshairs.Scope.Visible == false and Toggles.ForceCH.Value == true then
@@ -1511,3 +1755,13 @@ SaveManager:SetFolder('Vainless/')
 SaveManager:BuildConfigSection(SettingsTab) 
 
 ThemeManager:ApplyToTab(SettingsTab)
+
+
+local Credits = SettingsTab:AddRightGroupbox('Credits')
+local Version = 'Debug 0.1'
+Credits:AddLabel('Made by Vainless')
+Credits:AddLabel('UI Library: Linoria Hub')
+Credits:AddLabel('Version: '..Version)
+Credits:AddButton("Copy Discord Link", function()
+	setclipboard('https://discord.gg/kHzhmjpMqk')
+end)

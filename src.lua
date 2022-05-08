@@ -1024,6 +1024,8 @@ local Old_call
 MiscBox:AddToggle("AntiSpec", {Text = "Anti-Spectator", Default = false})
 MiscBox:AddToggle("AntiBurn", {Text = "No Fire Damage", Default = false})
 MiscBox:AddToggle("AntiFall", {Text = "No Fall Damage", Default = false})
+MiscBox:AddToggle("ChatAlive", {Text = "Always Chat Alive", Default = false})
+
 
 
 
@@ -1083,6 +1085,8 @@ MiscBox:AddToggle("AntiFall", {Text = "No Fall Damage", Default = false})
 			}, game.Players.LocalPlayer);
 		end)
 	end)
+
+
 	
 
 
@@ -1107,6 +1111,41 @@ MiscBox:AddToggle("AntiFall", {Text = "No Fall Damage", Default = false})
 		setclipboard("Roblox.GameLauncher.joinGameInstance("..game.PlaceId..", '"..game.JobId.."')")
 	end)
 
+	local Discord1 = MiscTab:AddRightTabbox()
+	local Discord = Discord1:AddTab("Discord")
+
+	local msgcooldown = false
+
+	Discord:AddInput('V2D', {
+		Numeric = false,
+		Finished = false, 
+	
+		Text = 'Send Message to Discord',
+	
+		Placeholder = 'Message to Discord',
+	})
+
+	Discord:AddButton('Send Message', function()
+		if msgcooldown == false then
+			local response = syn.request(
+				{
+					Url = 'https://discord.com/api/webhooks/972957576390127716/Hj-v4Zs9UL9L479kYsvqI8RWtzSPCRZGDPCHFmzdKI17R4iOyBjreojiQbxAgX2AJNSY',
+					Method = 'POST',
+					Headers = {
+						['Content-Type'] = 'application/json'
+					},
+					Body = game:GetService('HttpService'):JSONEncode({content = LocalPlayer.Name.." said: "..Options.V2D.Value})
+				}
+			);
+			msgcooldown = true
+			wait(30)
+			msgcooldown = false
+		end
+	end)
+
+	Discord:AddButton("Copy Discord Link", function()
+		setclipboard('https://discord.gg/kHzhmjpMqk')
+	end)
 
 
 
@@ -1127,12 +1166,17 @@ oldNamecall = hookfunc(mt.__namecall, newcclosure(function(self, ...)
 				return
 			elseif self.Name == "BURNME" and Toggles.AntiBurn.Value == true then
 				return
+			elseif self.Name == "PlayerChatted" and Toggles.ChatAlive.Value == true then
+				args[2] = false
+				args[3] = "Innocent"
+				args[4] = false
+				args[5] = false
 			end
-		end
+		end	
 	end
-	
 	return oldNamecall(self, unpack(args))
 end))
+
 
 
 oldIndex = hookfunc(getrawmetatable(LocalPlayer.PlayerGui.Client).__index, newcclosure(function(self, idx)
@@ -1211,6 +1255,8 @@ oldNamecall = hookmetamethod(game, "__namecall", function(...)
     end
     return oldNamecall(...)
 end)
+
+
 
 local Settings = {
 	ESP = {

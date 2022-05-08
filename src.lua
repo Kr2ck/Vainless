@@ -1688,8 +1688,6 @@ VissBox:AddToggle("NightMode", {Text = "NightMode", Default = false}):OnChanged(
     end
 end)
 
-VissBox:AddToggle("BetterShadows", {Text = "Better Shadows", Default = false})
-
 game:GetService("RunService").Stepped:connect(function()
 	pcall(
             function()

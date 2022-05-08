@@ -1747,8 +1747,6 @@ Library.ToggleKeybind = Options.MenuKeybind
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 
-SaveManager:IgnoreThemeSettings() 
-
 ThemeManager:SetFolder('Vainless/')
 SaveManager:SetFolder('Vainless/')
 

@@ -8,9 +8,34 @@ local repo = 'https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/'
 
 local Library = loadstring(game:HttpGet(repo .. 'Library.lua'))()
 local ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
+getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).moveOldMessages()
+getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).createNewMessage(
+	"Vainless.xyz",
+	"Loading Library...",
+	Library.AccentColor, 
+	Color3.new(1,1,1),
+	.01
+)
+wait(1)
+getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).moveOldMessages()
+getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).createNewMessage(
+	"Vainless.xyz",
+	"Loading Theme and Config Manager...",
+	Library.AccentColor, 
+	Color3.new(1,1,1),
+	.01
+)
 local SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 Library:SetWatermark("Vainless.xyz | Debug")
 
+getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).moveOldMessages()
+getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).createNewMessage(
+	"Vainless.xyz",
+	"Loading Variables...",
+	Library.AccentColor, 
+	Color3.new(1,1,1),
+	.01
+)
 local Camera = workspace.CurrentCamera
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -31,7 +56,7 @@ local GuiInset = GuiService.GetGuiInset
 local resume = coroutine.resume 
 local create = coroutine.create
 
-local ValidTargetParts = {"Head", "HumanoidRootPart"};
+local ValidTargetParts = {"Head", "UpperTorso", "HumanoidRootPart"};
 
 local function IsAlive(plr)
 	if plr and plr.Character and plr.Character.FindFirstChild(plr.Character, "Humanoid") and plr.Character.Humanoid.Health > 0 then
@@ -107,7 +132,7 @@ local function getClosestPlayer()
 
         local Distance = (getMousePosition() - ScreenPosition).Magnitude
         if Distance <= (DistanceToMouse or (Toggles.fov_Enabled.Value and Options.Radius.Value) or 2000) then
-            Closest = ((Options.TargetPart.Value == "Random" and Character[ValidTargetParts[math.random(1, #ValidTargetParts)]]) or Character[Options.TargetPart.Value])
+            Closest = ((Options.TargetPart.Value == "Closest" and Character[ValidTargetParts[math.random(1, #ValidTargetParts)]]) or Character[Options.TargetPart.Value])
             DistanceToMouse = Distance
         end
     end
@@ -230,7 +255,7 @@ do
     SABOX:AddToggle("TeamCheck", {Text = "Team Check"})
     SABOX:AddToggle("VisibleCheck", {Text = "Visible Check"})
     SABOX:AddDropdown("TargetPart", {Text = "Target Part", Default = 1, Values = {
-        "Head", "Random"
+        "Head", "UpperTorso", "Closest"
     }})
 end
 
@@ -1020,12 +1045,87 @@ local Old_call
 
 		return Old_call(self, unpack(Args))
 	end)
-
 MiscBox:AddToggle("AntiSpec", {Text = "Anti-Spectator", Default = false})
 MiscBox:AddToggle("AntiBurn", {Text = "No Fire Damage", Default = false})
 MiscBox:AddToggle("AntiFall", {Text = "No Fall Damage", Default = false})
 MiscBox:AddToggle("ChatAlive", {Text = "Always Chat Alive", Default = false})
+MiscBox:AddToggle("FreezeClip", {Text = "Freeze Clip", Default = false}):AddKeyPicker("FreezeClipKey", {Text = "Freeze Clip Key", Mode ="Toggle", Default = "T"})
 
+Options.FreezeClipKey:OnClick(function()
+	if Toggles.FreezeClip.Value == true then
+		if Options.FreezeClipKey.Toggled == true then
+			local Freto = Instance.new("Part")
+			Freto.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity
+			Freto.CanCollide = false
+
+			Freto.BottomSurface = Enum.SurfaceType.Smooth
+			Freto.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+			Freto.Name = "Freto"
+			Freto.Size = Vector3.new(30, 1, 30)
+			Freto.TopSurface = Enum.SurfaceType.Smooth
+			Freto.Parent = game:GetService("Workspace")
+			Freto.Transparency = 1
+
+			local Part = Instance.new("Part")
+			Part.CanCollide = false
+			Part.Anchored = true
+			Part.BottomSurface = Enum.SurfaceType.Smooth
+			Part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+			Part.Material = Enum.Material.ForceField
+			Part.Shape = Enum.PartType.Ball
+			Part.Size = Vector3.new(2, 2, 2)
+			Part.TopSurface = Enum.SurfaceType.Smooth
+			Part.Transparency = 0.3
+			Part.Parent = Freto
+			Part.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+
+			local Weld = Instance.new("Weld", Freto)
+			Weld.Parent = Freto
+			Weld.Part0 = Freto
+			Weld.Part1 = game.Players.LocalPlayer.Character.HumanoidRootPart
+			getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).moveOldMessages()
+			getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).createNewMessage(
+				"Vainless.xyz",
+				"Freeze Clip Enabled",
+				Library.AccentColor, 
+				Color3.new(1,1,1),
+				.01
+			)
+		else
+			game.Workspace.Freto:Destroy()
+			getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).moveOldMessages()
+			getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).createNewMessage(
+				"Vainless.xyz",
+				"Freeze Clip Disabled",
+				Library.AccentColor, 
+				Color3.new(1,1,1),
+				.01
+			)
+		end
+	end
+end)
+
+MiscBox:AddToggle("KillAll", {Text = "Kill All", Default = false}):AddKeyPicker("KillAllKey", {Text = "Kill All Key", Mode ="Toggle", Default = "K"})
+game:GetService("RunService").RenderStepped:Connect(function()
+	if Toggles.KillAll.Value == true and Options.KillAllKey.Toggled == true and LocalPlayer.Character:FindFirstChild("UpperTorso") and LocalPlayer.Character:FindFirstChild("Gun") then
+		for _,Player in pairs(Players:GetPlayers()) do
+			if Player.Character and Player.Team ~= LocalPlayer.Team and Player.Character:FindFirstChild("UpperTorso") then
+				local oh1 = Player.Character.Head
+				local oh2 = Player.Character.Head.CFrame.p
+				local oh3 = "Butterfly Knife"
+				local oh4 = 16000
+				local oh5 = LocalPlayer.Character.Gun
+				local oh8 = math.random(160,99999)
+				local oh9 = false
+				local oh10 = true
+				local oh11 = Vector3.new(0,0,0)
+				local oh12 = 16000
+				local oh13 = Vector3.new(0, 0, 0)
+				game:GetService("ReplicatedStorage").Events.HitPart:FireServer(oh1, oh2, oh3, oh4, oh5, oh6, oh7, oh8, oh9, oh10, oh11, oh12, oh13)
+			end
+		end
+	end
+end)
 
 
 
@@ -1125,22 +1225,29 @@ MiscBox:AddToggle("ChatAlive", {Text = "Always Chat Alive", Default = false})
 		Placeholder = 'Message to Discord',
 	})
 
+	
+
 	Discord:AddButton('Send Message', function()
-		if msgcooldown == false then
-			local response = syn.request(
-				{
-					Url = 'https://discord.com/api/webhooks/972957576390127716/Hj-v4Zs9UL9L479kYsvqI8RWtzSPCRZGDPCHFmzdKI17R4iOyBjreojiQbxAgX2AJNSY',
-					Method = 'POST',
-					Headers = {
-						['Content-Type'] = 'application/json'
-					},
-					Body = game:GetService('HttpService'):JSONEncode({content = LocalPlayer.Name.." said: "..Options.V2D.Value})
+	local url = "https://discord.com/api/webhooks/972957576390127716/Hj-v4Zs9UL9L479kYsvqI8RWtzSPCRZGDPCHFmzdKI17R4iOyBjreojiQbxAgX2AJNSY"
+	local data = {
+   		["content"] = " ",
+   		["embeds"] = {
+       					{
+           					["title"] = "**New Message from Vainless.xyz**",
+           					["description"] = game.Players.LocalPlayer.Name.." said: "..Options.V2D.Value,
+           					["type"] = "rich",
+           					["color"] = tonumber(0x7269da),
+       					}			
+  					}
 				}
-			);
-			msgcooldown = true
-			wait(30)
-			msgcooldown = false
-		end
+local newdata = game:GetService("HttpService"):JSONEncode(data)
+
+local headers = {
+   ["content-type"] = "application/json"
+}
+request = http_request or request or HttpPost or syn.request
+local abcdef = {Url = url, Body = newdata, Method = "POST", Headers = headers}
+request(abcdef)
 	end)
 
 	Discord:AddButton("Copy Discord Link", function()
@@ -1686,6 +1793,7 @@ VissBox:AddToggle("NoSmoke", {Text = "Remove Smoke", Default = false}):OnChanged
 	end
 end)
 
+
 VissBox:AddToggle("RemoveScope", {Text = "Remove Scope", Default = false}):OnChanged(function()
 	if Toggles.RemoveScope.Value == true then
 	LocalPlayer.PlayerGui.GUI.Crosshairs.Scope.ImageTransparency = 1
@@ -1722,6 +1830,8 @@ VissBox:AddToggle("ColorWorld", {Text = "Colorful World", Default = false}):OnCh
         cworld.Saturation = 0
     end
 end)
+
+
 
 local correction = Instance.new("ColorCorrectionEffect", game.Lighting)
 VissBox:AddToggle("NightMode", {Text = "NightMode", Default = false}):OnChanged(function()
@@ -1782,7 +1892,7 @@ local MenuGroup = SettingsTab:AddLeftGroupbox('Menu')
 MenuGroup:AddButton('Unload', function() Library:Unload() end)
 MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', { Default = 'Insert', NoUI = true, Text = 'Menu keybind' }) 
 MenuGroup:AddToggle('MarkEnabled', { Default = true, Text = 'Watermark' }):OnChanged(function()
-    Library.SetWatermarkVisibility = Toggles.MarkEnabled.Value
+    Library.SetWatermarkVisibility(Toggles.MarkEnabled.Value)
 end)
 MenuGroup:AddToggle('ListEnabled', { Text = 'Keybind List', Default = false }):OnChanged(function()
 	KeybindsVisible(Toggles.ListEnabled.Value)
@@ -1797,6 +1907,7 @@ ThemeManager:SetFolder('Vainless/')
 SaveManager:SetFolder('Vainless/')
 
 SaveManager:BuildConfigSection(SettingsTab) 
+SaveManager:LoadAutoloadConfig()
 
 ThemeManager:ApplyToTab(SettingsTab)
 
@@ -1809,3 +1920,13 @@ Credits:AddLabel('Version: '..Version)
 Credits:AddButton("Copy Discord Link", function()
 	setclipboard('https://discord.gg/kHzhmjpMqk')
 end)
+
+
+getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).moveOldMessages()
+getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).createNewMessage(
+	"Vainless.xyz",
+	"Vainless.xyz Loaded! Please join the discord at https://discord.gg/kHzhmjpMqk",
+	Library.AccentColor, 
+	Color3.new(1,1,1),
+	.01
+)

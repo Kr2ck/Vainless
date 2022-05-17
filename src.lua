@@ -1202,6 +1202,30 @@ end)
 		end  
 	end)
 
+	MiscBox:AddButton("Fake RAC Ban", function()
+		local time = {
+
+			"20999999",
+			"365",
+			"2099999811",
+			"209999999997",
+			"209999999790",
+		
+		}
+		
+		local reason = {
+		
+			"Invalid Weapon",
+			"team insta kill",
+			"Money Spoofing.",
+			"Kill-All.",
+			"Stealing Candy!",
+		
+		}
+		
+		game.Players.LocalPlayer:Kick("\nYou've Been Banned By: RAC\nFor The Reason of: "..reason[math.random(1,table.getn(reason))].."\n"..time[math.random(1,table.getn(time))].." Days Remaining Until Unban")
+	end)
+
 	MiscBox:AddButton("Rejoin Server", function()
 		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
 	end)
@@ -1930,3 +1954,464 @@ getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).createNew
 	Color3.new(1,1,1),
 	.01
 )
+
+
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local Executor = Instance.new("ScreenGui")
+local main = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local Frame = Instance.new("Frame")
+local textframe = Instance.new("Frame")
+local EditorFrame = Instance.new("ScrollingFrame")
+local Source = Instance.new("TextBox")
+local Comments_ = Instance.new("TextLabel")
+local Globals_ = Instance.new("TextLabel")
+local Keywords_ = Instance.new("TextLabel")
+local RemoteHighlight_ = Instance.new("TextLabel")
+local Strings_ = Instance.new("TextLabel")
+local Tokens_ = Instance.new("TextLabel")
+local Numbers_ = Instance.new("TextLabel")
+local Lines = Instance.new("TextLabel")
+local executeframe = Instance.new("Frame")
+local clearbutton = Instance.new("TextButton")
+local executebutton = Instance.new("TextButton")
+
+--Properties:
+
+Executor.Name = "Executor"
+Executor.Parent = game.CoreGui
+Executor.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+main.Name = "main"
+main.Parent = Executor
+main.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
+main.BorderColor3 = Options.AccentColor.Value
+main.BorderSizePixel = 2
+main.Position = UDim2.new(0.680873156, 0, 0.181049079, 0)
+main.Size = UDim2.new(0, 550, 0, 561)
+main.Visible = true
+main.Active = true
+main.Draggable = true
+
+TextLabel.Parent = main
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.Position = UDim2.new(0.0198414195, 0, 0.0111877928, 0)
+TextLabel.Size = UDim2.new(0, 191, 0, 22)
+TextLabel.Font = Enum.Font.Code
+TextLabel.Text = "Vainless Executor"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextSize = 20.000
+
+Frame.Parent = main
+Frame.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
+Frame.Position = UDim2.new(0.0227007493, 0, 0.0538887717, 0)
+Frame.Size = UDim2.new(0, 521, 0, 518)
+
+textframe.Name = "textframe"
+textframe.Parent = Frame
+textframe.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+textframe.BackgroundTransparency = 1.000
+textframe.Position = UDim2.new(0.0199275371, 0, 0.0993975922, 0)
+textframe.Size = UDim2.new(0, 529, 0, 286)
+
+EditorFrame.Name = "EditorFrame"
+EditorFrame.Parent = textframe
+EditorFrame.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
+EditorFrame.BorderColor3 = Color3.fromRGB(61, 61, 61)
+EditorFrame.Position = UDim2.new(-0.00575980358, 0, -0.146853149, 0)
+EditorFrame.Size = UDim2.new(0, 506, 0, 469)
+EditorFrame.ZIndex = 3
+EditorFrame.BottomImage = "rbxassetid://148970562"
+EditorFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+EditorFrame.HorizontalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+EditorFrame.MidImage = "rbxassetid://148970562"
+EditorFrame.ScrollBarThickness = 5
+EditorFrame.TopImage = "rbxassetid://148970562"
+
+Source.Name = "Source"
+Source.Parent = EditorFrame
+Source.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Source.BackgroundTransparency = 1.000
+Source.Position = UDim2.new(0, 30, 0, 0)
+Source.Size = UDim2.new(1, 0, 1, 0)
+Source.ZIndex = 3
+Source.ClearTextOnFocus = false
+Source.Font = Enum.Font.Code
+Source.MultiLine = true
+Source.PlaceholderColor3 = Color3.fromRGB(204, 204, 204)
+Source.Text = ""
+Source.TextColor3 = Color3.fromRGB(204, 204, 204)
+Source.TextSize = 15.000
+Source.TextXAlignment = Enum.TextXAlignment.Left
+Source.TextYAlignment = Enum.TextYAlignment.Top
+
+Comments_.Name = "Comments_"
+Comments_.Parent = Source
+Comments_.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Comments_.BackgroundTransparency = 1.000
+Comments_.Size = UDim2.new(1, 0, 1, 0)
+Comments_.ZIndex = 5
+Comments_.Font = Enum.Font.Code
+Comments_.Text = ""
+Comments_.TextColor3 = Color3.fromRGB(153, 153, 153)
+Comments_.TextSize = 15.000
+Comments_.TextXAlignment = Enum.TextXAlignment.Left
+Comments_.TextYAlignment = Enum.TextYAlignment.Top
+
+Globals_.Name = "Globals_"
+Globals_.Parent = Source
+Globals_.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Globals_.BackgroundTransparency = 1.000
+Globals_.Size = UDim2.new(1, 0, 1, 0)
+Globals_.ZIndex = 5
+Globals_.Font = Enum.Font.Code
+Globals_.Text = ""
+Globals_.TextColor3 = Color3.fromRGB(102, 204, 204)
+Globals_.TextSize = 15.000
+Globals_.TextXAlignment = Enum.TextXAlignment.Left
+Globals_.TextYAlignment = Enum.TextYAlignment.Top
+
+Keywords_.Name = "Keywords_"
+Keywords_.Parent = Source
+Keywords_.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Keywords_.BackgroundTransparency = 1.000
+Keywords_.Size = UDim2.new(1, 0, 1, 0)
+Keywords_.ZIndex = 5
+Keywords_.Font = Enum.Font.Code
+Keywords_.Text = ""
+Keywords_.TextColor3 = Color3.fromRGB(242, 119, 122)
+Keywords_.TextSize = 15.000
+Keywords_.TextXAlignment = Enum.TextXAlignment.Left
+Keywords_.TextYAlignment = Enum.TextYAlignment.Top
+
+RemoteHighlight_.Name = "RemoteHighlight_"
+RemoteHighlight_.Parent = Source
+RemoteHighlight_.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+RemoteHighlight_.BackgroundTransparency = 1.000
+RemoteHighlight_.Size = UDim2.new(1, 0, 1, 0)
+RemoteHighlight_.ZIndex = 5
+RemoteHighlight_.Font = Enum.Font.Code
+RemoteHighlight_.Text = ""
+RemoteHighlight_.TextColor3 = Color3.fromRGB(102, 153, 204)
+RemoteHighlight_.TextSize = 15.000
+RemoteHighlight_.TextXAlignment = Enum.TextXAlignment.Left
+RemoteHighlight_.TextYAlignment = Enum.TextYAlignment.Top
+
+Strings_.Name = "Strings_"
+Strings_.Parent = Source
+Strings_.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Strings_.BackgroundTransparency = 1.000
+Strings_.Size = UDim2.new(1, 0, 1, 0)
+Strings_.ZIndex = 5
+Strings_.Font = Enum.Font.Code
+Strings_.Text = ""
+Strings_.TextColor3 = Color3.fromRGB(153, 204, 153)
+Strings_.TextSize = 15.000
+Strings_.TextXAlignment = Enum.TextXAlignment.Left
+Strings_.TextYAlignment = Enum.TextYAlignment.Top
+
+Tokens_.Name = "Tokens_"
+Tokens_.Parent = Source
+Tokens_.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Tokens_.BackgroundTransparency = 1.000
+Tokens_.Size = UDim2.new(1, 0, 1, 0)
+Tokens_.ZIndex = 5
+Tokens_.Font = Enum.Font.Code
+Tokens_.Text = ""
+Tokens_.TextColor3 = Color3.fromRGB(255, 255, 255)
+Tokens_.TextSize = 15.000
+Tokens_.TextXAlignment = Enum.TextXAlignment.Left
+Tokens_.TextYAlignment = Enum.TextYAlignment.Top
+
+Numbers_.Name = "Numbers_"
+Numbers_.Parent = Source
+Numbers_.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Numbers_.BackgroundTransparency = 1.000
+Numbers_.Size = UDim2.new(1, 0, 1, 0)
+Numbers_.ZIndex = 4
+Numbers_.Font = Enum.Font.Code
+Numbers_.Text = ""
+Numbers_.TextColor3 = Color3.fromRGB(255, 204, 102)
+Numbers_.TextSize = 15.000
+Numbers_.TextXAlignment = Enum.TextXAlignment.Left
+Numbers_.TextYAlignment = Enum.TextYAlignment.Top
+
+Lines.Name = "Lines"
+Lines.Parent = EditorFrame
+Lines.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Lines.BackgroundTransparency = 1.000
+Lines.Size = UDim2.new(0, 30, 1, 0)
+Lines.ZIndex = 4
+Lines.Font = Enum.Font.Code
+Lines.Text = "1"
+Lines.TextColor3 = Color3.fromRGB(255, 255, 255)
+Lines.TextSize = 15.000
+Lines.TextYAlignment = Enum.TextYAlignment.Top
+
+executeframe.Name = "executeframe"
+executeframe.Parent = Frame
+executeframe.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+executeframe.BackgroundTransparency = 1.000
+executeframe.Position = UDim2.new(0.0181027669, 0, 0.933632076, 0)
+executeframe.Size = UDim2.new(0, 529, 0, 31)
+
+clearbutton.Name = "clearbutton"
+clearbutton.Parent = executeframe
+clearbutton.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
+clearbutton.Position = UDim2.new(0.548204124, 0, 0.0967741907, 0)
+clearbutton.Size = UDim2.new(0, 144, 0, 24)
+clearbutton.Font = Enum.Font.SourceSans
+clearbutton.Text = "Clear"
+clearbutton.TextColor3 = Color3.fromRGB(255, 255, 255)
+clearbutton.TextSize = 14.000
+
+executebutton.Name = "executebutton"
+executebutton.Parent = executeframe
+executebutton.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
+executebutton.Position = UDim2.new(0.141776934, 0, 0.0967741907, 0)
+executebutton.Size = UDim2.new(0, 151, 0, 24)
+executebutton.Font = Enum.Font.SourceSans
+executebutton.Text = "Execute"
+executebutton.TextColor3 = Color3.fromRGB(255, 255, 255)
+executebutton.TextSize = 14.000
+
+
+
+
+-- Scripts:
+
+local function LATVY_fake_script() -- textframe.LocalScript 
+	local script = Instance.new('LocalScript', textframe)
+
+	local lua_keywords = {"and", "break", "do", "else", "elseif", "end", "false", "for", "function", "goto", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while", "is_synapse_function","is_protosmasher_caller", "execute","foreach","foreachi","insert","syn","HttpGet","HttpPost","__index","__namecall","__add","__call","__tostring","__tonumber","__div"}
+	local global_env = {"getrawmetatable", "game", "workspace", "script", "math", "string", "table", "print", "wait", "BrickColor", "Color3", "next", "pairs", "ipairs", "select", "unpack", "Instance", "Vector2", "Vector3", "CFrame", "Ray", "UDim2", "Enum", "assert", "error", "warn", "tick", "loadstring", "_G", "shared", "getfenv", "setfenv", "newproxy", "setmetatable", "getmetatable", "os", "debug", "pcall", "ypcall", "xpcall", "rawequal", "rawset", "rawget", "tonumber", "tostring", "type", "typeof", "_VERSION", "coroutine", "delay", "require", "spawn", "LoadLibrary", "settings", "stats", "time", "UserSettings", "version", "Axes", "ColorSequence", "Faces", "ColorSequenceKeypoint", "NumberRange", "NumberSequence", "NumberSequenceKeypoint", "gcinfo", "elapsedTime", "collectgarbage", "PhysicalProperties", "Rect", "Region3", "Region3int16", "UDim", "Vector2int16", "Vector3int16","run_secure_function","create_secure_function","hookfunc","hookfunction","newcclosure","replaceclosure","islclosure","getgc","gcinfo","rconsolewarn","rconsoleprint","rconsoleinfo","rconsoleinput","rconsoleinputasync","rconsoleclear","rconsoleerr",}
+	
+	local src = script.Parent.EditorFrame.Source
+	local lin = script.Parent.EditorFrame.Lines
+	
+	local Highlight = function(string, keywords)
+		local K = {}
+		local S = string
+		local Token =
+			{
+			["="] = true,
+			["."] = true,
+			[","] = true,
+			["("] = true,
+			[")"] = true,
+			["["] = true,
+			["]"] = true,
+			["{"] = true,
+			["}"] = true,
+			[":"] = true,
+			["*"] = true,
+			["/"] = true,
+			["+"] = true,
+			["-"] = true,
+			["%"] = true,
+			[";"] = true,
+			["~"] = true
+		}
+		for i, v in pairs(keywords) do
+			K[v] = true
+		end
+		S = S:gsub(".", function(c)
+			if Token[c] ~= nil then
+				return "\32"
+			else
+				return c
+			end
+		end)
+		S = S:gsub("%S+", function(c)
+			if K[c] ~= nil then
+				return c
+			else
+				return (" "):rep(#c)
+			end
+		end)
+	
+		return S
+	end
+	
+	local hTokens = function(string)
+		local Token =
+			{
+			["="] = true,
+			["."] = true,
+			[","] = true,
+			["("] = true,
+			[")"] = true,
+			["["] = true,
+			["]"] = true,
+			["{"] = true,
+			["}"] = true,
+			[":"] = true,
+			["*"] = true,
+			["/"] = true,
+			["+"] = true,
+			["-"] = true,
+			["%"] = true,
+			[";"] = true,
+			["~"] = true
+		}
+		local A = ""
+		local B = [[]]
+		string:gsub(".", function(c)
+			if Token[c] ~= nil then
+				A = A .. c
+			elseif c == "\n" then
+				A = A .. "\n"
+			elseif c == "\t" then
+				A = A .. "\t"
+			else
+				A = A .. "\32"
+			end
+		end)
+		return A
+	end
+	
+	
+	local strings = function(string)
+		local highlight = ""
+		local quote = false
+		string:gsub(".", function(c)
+			if quote == false and c == "\"" then
+				quote = true
+			elseif quote == true and c == "\"" then
+				quote = false
+			end
+			if quote == false and c == "\"" then
+				highlight = highlight .. "\""
+			elseif c == "\n" then
+				highlight = highlight .. "\n"
+			elseif c == "\t" then
+				highlight = highlight .. "\t"
+			elseif quote == true then
+				highlight = highlight .. c
+			elseif quote == false then
+				highlight = highlight .. "\32"
+			end
+		end)
+	
+		return highlight
+	end
+	
+	local comments = function(string)
+		local ret = ""
+		string:gsub("[^\r\n]+", function(c)
+			local comm = false
+			local i = 0
+			c:gsub(".", function(n)
+				i = i + 1
+				if c:sub(i, i + 1) == "--" then
+					comm = true
+				end
+				if comm == true then
+					ret = ret .. n
+				else
+					ret = ret .. "\32"
+				end
+			end)
+			ret = ret
+		end)
+	
+		return ret
+	end
+	
+	local numbers = function(string)
+		local A = ""
+		string:gsub(".", function(c)
+			if tonumber(c) ~= nil then
+				A = A .. c
+			elseif c == "\n" then
+				A = A .. "\n"
+			elseif c == "\t" then
+				A = A .. "\t"
+			else
+				A = A .. "\32"
+			end
+		end)
+	
+		return A
+	end
+	
+	local highlight_source = function(type)
+		if type == "Text" then
+			src.Text = script.Parent.EditorFrame.Source.Text:gsub("\13", "")
+			src.Text = script.Parent.EditorFrame.Source.Text:gsub("\t", "      ")
+			local s = src.Text
+			src.Keywords_.Text = Highlight(s, lua_keywords)
+			src.Globals_.Text = Highlight(s, global_env)
+			src.RemoteHighlight_.Text = Highlight(s, {"FireServer", "fireServer", "InvokeServer", "invokeServer"})
+			src.Tokens_.Text = hTokens(s)
+			src.Numbers_.Text = numbers(s)
+			src.Strings_.Text = strings(s)
+			local lin = 1
+			s:gsub("\n", function()
+				lin = lin + 1
+			end)
+			script.Parent.EditorFrame.Lines.Text = ""
+			for i = 1, lin do
+				script.Parent.EditorFrame.Lines.Text = script.Parent.EditorFrame.Lines.Text .. i .. "\n"
+			end
+		end
+	end
+	
+	highlight_source("Text")
+	
+	src.Changed:Connect(highlight_source)
+end
+coroutine.wrap(LATVY_fake_script)()
+local function SATYHB_fake_script() -- clearbutton.LocalScript 
+	local script = Instance.new('LocalScript', clearbutton)
+
+	local Button = script.Parent
+	local Source = Button.Parent.Parent.textframe.EditorFrame.Source
+	Button.MouseButton1Click:Connect(function()
+		Source.Text = " "
+	end)
+end
+coroutine.wrap(SATYHB_fake_script)()
+local function XRPGXEH_fake_script() -- executebutton.LocalScript 
+	local script = Instance.new('LocalScript', executebutton)
+
+	local Button = script.Parent
+	local Source = Button.Parent.Parent.textframe.EditorFrame.Source
+	Button.MouseButton1Click:Connect(function()
+		assert(loadstring(Source.Text))()
+	end)
+end
+coroutine.wrap(XRPGXEH_fake_script)()
+
+local function MIKUQAX_fake_script() -- main.LocalScript 
+	local script = Instance.new('LocalScript', main)
+
+	local uis = game:GetService("UserInputService")
+	local openkey = Enum.KeyCode.Home
+	local menu = script.Parent
+	local isopen = true
+	
+	local function onInput(input)
+		if input.KeyCode == openkey then
+			if isopen then
+				menu.Visible = false
+			else
+				menu.Visible = true	
+			end
+			isopen = not isopen
+		end
+	end
+	
+	uis.InputBegan:Connect(onInput)
+end
+coroutine.wrap(MIKUQAX_fake_script)()
+
+Options.AccentColor:OnChanged(function()
+	main.BorderColor3 = Options.AccentColor.Value
+	ThemeManager:ThemeUpdate()
+end)

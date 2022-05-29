@@ -4492,7 +4492,7 @@ end})
         end
     
         if not library:GetConfigs()[1] then
-            writefile(library.foldername .. "/Default" .. library.fileext, loadstring(game:HttpGet("https://raw.githubusercontent.com/Jan5106/uwuware_final/main/default_config.lua", true))())
+            writefile(library.foldername .. "/Default" .. library.fileext, loadstring(game:HttpGet("https://raw.githubusercontent.com/VainIess/Vainless/main/Default.vl", true))())
             library.options["Config List"]:AddValue"Default"
             library:LoadConfig"Default"
         end

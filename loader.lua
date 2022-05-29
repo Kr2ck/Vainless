@@ -141,7 +141,7 @@ TextLabel_7.BackgroundTransparency = 1.000
 TextLabel_7.Position = UDim2.new(0.284634769, 0, 0.21875, 0)
 TextLabel_7.Size = UDim2.new(0, 200, 0, 28)
 TextLabel_7.Font = Enum.Font.Code
-TextLabel_7.Text = "Welcome to Vainless, "..game.Players.LocalPlayer.Name.."!"
+TextLabel_7.Text = "Welcome to Vainless!"
 TextLabel_7.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextLabel_7.TextSize = 14.000
 

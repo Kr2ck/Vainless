@@ -21,7 +21,7 @@ repeat wait() until game:IsLoaded()
 		getgenv().library:Unload()
 	end
 
-	local library = {design = getgenv().design == "vainless", tabs = {}, draggable = true, flags = {}, title = "Vainless.xyz", open = false, mousestate = inputService.MouseIconEnabled, popup = nil, instances = {}, connections = {}, options = {}, notifications = {}, tabSize = 0, theme = {}, foldername = "uw_configs", fileext = ".uw"}
+	local library = {design = getgenv().design == "vainless", tabs = {}, draggable = true, flags = {}, title = "Vainless.xyz", open = false, mousestate = inputService.MouseIconEnabled, popup = nil, instances = {}, connections = {}, options = {}, notifications = {}, tabSize = 0, theme = {}, foldername = "Vainless", fileext = ".vl"}
 	getgenv().library = library
 
 	--Locals

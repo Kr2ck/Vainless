@@ -2856,7 +2856,7 @@ repeat wait() until game:IsLoaded()
 		library:Create("Frame", {
 			Position = UDim2.new(0, 0, 0, 20),
 			Size = UDim2.new(0, 0, 0, 1),
-			BackgroundColor3 = Color3.fromRGB(255, 65, 65),
+			BackgroundColor3 = Color3.fromRGB(34,35,222),
 			BorderSizePixel = 0,
 			Parent = notification
 		}):TweenSize(UDim2.new(1, 0, 0, 1), "Out", "Linear", duration)
@@ -2867,7 +2867,7 @@ repeat wait() until game:IsLoaded()
 			BackgroundTransparency = 1,
 			Text = "                                  Vainless",
 			Font = Enum.Font.Gotham,
-			TextColor3 = Color3.fromRGB(255, 65, 65),
+			TextColor3 = Color3.fromRGB(34,35,222),
 			TextSize = 16,
 			TextTransparency = 1,
 			Parent = notification
@@ -3462,7 +3462,16 @@ VisualSection:AddToggle({text = "Colorful World", flag = "colorfulworld", callba
         cworld.Saturation = 0
     end
 end})
-    
+local correction = Instance.new("ColorCorrectionEffect", game.Lighting)
+VisualSection:AddToggle({text = "Night Mode", flag = "nightmode", callback = function(val)
+if val then
+	correction.Brightness = -0.15
+	game.Lighting.Brightness = 0
+else
+	correction.Brightness = 0
+	game.Lighting.Brightness = 1
+	end
+end})
 game:GetService("RunService").Stepped:connect(function()
 	pcall(
             function()

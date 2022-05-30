@@ -2768,6 +2768,33 @@ repeat wait() until game:IsLoaded()
 			end
 		end
 	end)
+	library.SettingsMenu:AddBox({text = "Custom NAME", callback = function(selected)
+		NChanger = selected
+	end})
+	library.SettingsMenu:AddList({text = "Custom FONT", values = {"Code", "Arcade", "Bangers", "Creepster", "GothamBlack", "LuckiestGuy", "Michroma", "PermanentMarker", "Sarpanch", "SpecialElite"}, callback = function(selected)
+		FChanger = selected
+	end})
+	library.SettingsMenu:AddButton({text = "Change Name", callback = function()
+		for i,v in pairs(game.CoreGui:GetChildren()) do
+			if v.Name == "ScreenGui" and v:FindFirstChild("ImageButton") and v.ImageButton:FindFirstChild("TextLabel") then
+				a = v.ImageButton.TextLabel
+			elseif v:FindFirstChild("TextLabel") and v.TextLabel.Text:find(game.Players.LocalPlayer.Name) then
+				b = v.TextLabel
+			end
+		end
+	
+	if a then
+	a.Text = NChanger
+	a.Font = FChanger
+	end
+	if b then
+	b:GetPropertyChangedSignal("Text"):Connect(function()
+		b.Text = b.Text:gsub("cuteware", NChanger)
+		b.Font = FChanger
+		b.TextSize = "9"
+	end)
+	end
+	end})
 
 	library.ConfigSection = library.SettingsColumn1:AddSection"Configs"
 	library.ConfigSection:AddBox({text = "Config Name", skipflag = true})
@@ -2996,11 +3023,16 @@ repeat wait() until game:IsLoaded()
 		local LegitTab = library:AddTab("Legit")
 		local VisualsTab = library:AddTab("Visuals")
 		local MiscTab = library:AddTab("Misc")
+		local LuaTab = library:AddTab("Lua")
+		local LuaColumn1 = LuaTab:AddColumn()
+		local LuaSection = LuaColumn1:AddSection"Lua"
 	
 		local LegitColumn = LegitTab:AddColumn()
 		local LegitColumn1 = LegitTab:AddColumn()
 	
 		local SilentSection = LegitColumn:AddSection"Silent Aim"
+
+
 
 		SilentSection:AddToggle({text = "Enabled", flag = "Aimbot", callback = function() end})
 	SilentSection:AddToggle({text = "Team Check", flag = "TeamCheck"})
@@ -3729,7 +3761,7 @@ update()
 
 
 
-MiscSection:AddToggle({text = "Kill All", Default = false}):AddBind({flag = "Kill All Key", mode = "Toggle", key = "K"})
+MiscSection:AddToggle({text = "Kill All"}):AddBind({flag = "Kill All Key", mode = "Toggle", key = "K"})
 game:GetService("RunService").RenderStepped:Connect(function()
 	if library.flags["Kill All"] == true and library.flags["Kill All Key"] == true and LocalPlayer.Character:FindFirstChild("UpperTorso") and LocalPlayer.Character:FindFirstChild("Gun") then
 		for _,Player in pairs(Players:GetPlayers()) do
@@ -4461,6 +4493,39 @@ end})
 		setclipboard("Roblox.GameLauncher.joinGameInstance("..game.PlaceId..", '"..game.JobId.."')")
 	end})
 
+
+
+	getgenv().vainless = {}
+	vainless.AddButton = function(name, callback)
+		return LuaSection:AddButton({text = name, callback = callback})
+	end
+	vainless.AddToggle = function(name, callback)
+		return LuaSection:AddToggle({text = name, callback = callback})
+	end
+	vainless.AddToggleBind = function(name, keyflag, mode, key, callback)
+		return LuaSection:AddToggle({text = name}):AddBind({flag = keyflag, mode = mode, key = key, callback = callback})
+	end
+	vainless.AddSlider = function(name, min, max, value, float, callback)
+		return LuaSection:AddSlider({text = name, min = min, max = max, value = value, float = float, callback = callback})
+	end
+	vainless.AddList = function(name, values, callback)
+		return LuaSection:AddList({text = name, values = values, callback = callback})
+	end
+
+
+	makefolder("Vainless/lua")     
+	local allluas = {}  
+
+	for _,lua in pairs(listfiles("Vainless/lua")) do  
+		local luaname = string.gsub(lua, "Vainless/lua\\", "")  
+		table.insert(allluas, luaname)  
+	end     
+
+	LuaSection:AddList({text = "Luas", values = allluas})
+	LuaSection:AddButton({text = "Run Lua", callback = function()
+		loadstring(readfile("Vainless/lua\\"..library.flags["Luas"]))()  
+	end})
+	LuaSection:AddDivider("Scripts:")
 
 
 

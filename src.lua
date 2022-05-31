@@ -2774,7 +2774,7 @@ repeat wait() until game:IsLoaded()
 	library.SettingsMenu:AddList({text = "Custom FONT", values = {"Code", "Arcade", "Bangers", "Creepster", "GothamBlack", "LuckiestGuy", "Michroma", "PermanentMarker", "Sarpanch", "SpecialElite"}, callback = function(selected)
 		FChanger = selected
 	end})
-	library.SettingsMenu:AddButton({text = "Change Name", callback = function()
+	library.SettingsMenu:AddButton({text = "Change Name/Font", callback = function()
 		for i,v in pairs(game.CoreGui:GetChildren()) do
 			if v.Name == "ScreenGui" and v:FindFirstChild("ImageButton") and v.ImageButton:FindFirstChild("TextLabel") then
 				a = v.ImageButton.TextLabel
@@ -2795,6 +2795,122 @@ repeat wait() until game:IsLoaded()
 	end)
 	end
 	end})
+library.SettingsMenu:AddToggle({text = "Spectators List", callback = function(val)
+	if val then
+local SpectatorsList = Instance.new("ScreenGui")
+local Spectators = Instance.new("Frame")
+local Container = Instance.new("Frame")
+local Text = Instance.new("TextLabel")
+local Players = Instance.new("TextLabel")
+local Background = Instance.new("Frame")
+local Color = Instance.new("Frame")
+
+SpectatorsList.Parent = game.CoreGui
+SpectatorsList.Name = "SpectatorsList"
+SpectatorsList.Enabled = true
+
+Spectators.Name = "Spectators"
+Spectators.Parent = SpectatorsList
+Spectators.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+Spectators.BackgroundTransparency = 1.000
+Spectators.BorderColor3 = Color3.fromRGB(255, 255, 255)
+Spectators.Position = UDim2.new(0.00800000038, 0, 0.400000006, 49)
+Spectators.Size = UDim2.new(0, 155, 0, 24)
+
+Container.Name = "Container"
+Container.Parent = Spectators
+Container.BackgroundTransparency = 1.000
+Container.BorderSizePixel = 0
+Container.Position = UDim2.new(0, 0, 0, 4)
+Container.Size = UDim2.new(1, 0, 0, 14)
+Container.ZIndex = 3
+
+Text.Name = "Text"
+Text.Parent = Container
+Text.BackgroundTransparency = 1.000
+Text.Size = UDim2.new(1, 0.001, 1, 0)
+Text.ZIndex = 4
+Text.Font = Enum.Font.Fantasy
+Text.Text = "Spectators"
+Text.TextColor3 = Color3.fromRGB(65025, 65025, 65025)
+Text.TextSize = 13.500
+Text.TextStrokeTransparency = 0.000
+
+Players.Name = "Players"
+Players.Parent = Container
+Players.BackgroundTransparency = 1.000
+Players.Position = UDim2.new(0.0196080022, 0, 1.44285719, 0)
+Players.Size = UDim2.new(0.980391979, 0, 1.14285719, 0)
+Players.ZIndex = 4
+Players.Font = Enum.Font.Fantasy
+Players.Text = "loading"
+Players.TextColor3 = Color3.fromRGB(65025, 65025, 65025)
+Players.TextSize = 12.000
+Players.TextStrokeTransparency = 0.000
+Players.TextYAlignment = Enum.TextYAlignment.Top
+
+Background.Name = "Background"
+Background.Parent = Spectators
+Background.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+Background.BorderColor3 = library.flags["SpecColor"]
+Background.Size = UDim2.new(1, 0, 1, 0)
+
+Color.Name = "Color"
+Color.Parent = Spectators
+Color.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+Color.BorderSizePixel = 0
+Color.Size = UDim2.new(1, 0, 0, 2)
+Color.ZIndex = 2
+
+function GetSpectators()
+	local CurrentSpectators = ""
+	for i,v in pairs(game.Players:GetChildren()) do 
+		pcall(function()
+			if v ~= game.Players.LocalPlayer then
+				if not v.Character then 
+					if (v.CameraCF.Value.p - game.Workspace.CurrentCamera.CFrame.p).Magnitude < 10 then 
+						if CurrentSpectators == "" then
+								CurrentSpectators = v.Name
+							else
+								CurrentSpectators = CurrentSpectators.. "\n" ..v.Name
+							end
+						end
+					end
+				end
+			end)
+		end
+	return CurrentSpectators
+end
+
+spawn(function()
+	while wait(0.1) do
+		if SpectatorsList.Enabled then
+			Players.Text = GetSpectators()
+		end
+	end
+end)
+
+local function SCUAM_fake_script() -- Spectators.LocalScript 
+	local script = Instance.new('LocalScript', Spectators)
+	local gui = script.Parent
+	gui.Draggable = true
+	gui.Active = true
+end
+coroutine.wrap(SCUAM_fake_script)()
+else
+	for i,v in pairs(game.CoreGui:GetChildren()) do
+		if v.Name == "SpectatorsList" then
+			v:Destroy()
+		end
+	end
+end
+end}):AddColor({flag = "SpecColor", color = Color3.fromRGB(255, 255, 255), callback = function(color)
+	for i,v in pairs(game.CoreGui:GetChildren()) do
+		if v.Name == "SpectatorsList" then
+			v.Spectators.Background.BorderColor3 = color
+		end
+	end
+end})
 
 	library.ConfigSection = library.SettingsColumn1:AddSection"Configs"
 	library.ConfigSection:AddBox({text = "Config Name", skipflag = true})
@@ -3564,6 +3680,8 @@ local Old_call
 	ViewModelSection:AddSlider({text = "Z Offset", value = 0, min = -20, max = 20, float = 0.1})
 	ViewModelSection:AddToggle({text = "Flip Y"})
 	ViewModelSection:AddToggle({text = "Flip Z"})
+
+	
 	
 
 local MiscColumn = MiscTab:AddColumn()
@@ -3704,7 +3822,7 @@ MiscSection:AddToggle({text = "Anti-Spectator"})
 MiscSection:AddToggle({text = "No Fire Damage"})
 MiscSection:AddToggle({text = "No Fall Damage"})
 MiscSection:AddToggle({text = "Always Chat Alive"})
-MiscSection:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key", mode = "Toggle", key = "T", callback = function()
+MiscSection:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key", mode = "toggle", key = "T", callback = function()
 	if library.flags["Freeze Clip"] == true then
 		if library.flags["Freeze Clip Key"] == true then
 			local Freto = Instance.new("Part")
@@ -3744,13 +3862,16 @@ MiscSection:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key",
 	end
 end})
 
-local plrselect = {}
 
+local loopkillplr = {}
+			
+local Players = game:GetService("Players")
+	
 function update() 
 	local CurrentPlayer = 0 
 	for i,v in next, Players:GetPlayers() do 
 		CurrentPlayer = CurrentPlayer + 1 
-		table.insert(plrselect, v.Name)
+		table.insert(loopkillplr, v.Name)
 	end
 end
 			
@@ -3758,10 +3879,45 @@ Players.PlayerAdded:connect(update)
 Players.PlayerRemoving:connect(update)
 update()
 
+MiscSection:AddList({text = "Players", values = loopkillplr})
+
+MiscSection:AddToggle({text = "Loop Kill", callback = function()
+	if library.flags["Loop Kill"] and LocalPlayer.Character:FindFirstChild("Gun") then
+		_G.DisableLoopKill = false
+		local loopkill
+		loopkill = game:GetService("RunService").Heartbeat:Connect(function()
+			if _G.DisableLoopKill then 
+				loopkill:Disconnect() 
+				return 
+			end
+			if Players[library.flags["Players"]].Character and Players[library.flags["Players"]].Team ~= LocalPlayer.Team and Players[library.flags["Players"]].Character:FindFirstChild("UpperTorso") and LocalPlayer.Character:FindFirstChild("UpperTorso") then
+				local Arguments = {      
+					[1] = Players[library.flags["Players"]].Character.Head,      
+					[2] = Players[library.flags["Players"]].Character.Head.Position,      
+					[3] = cbClient.gun.Name,      
+					[4] = 4096,      
+					[5] = cbClient.gun, 
+					[6] = Vector3.new(),
+					[7] = Vector3.new(),
+					[8] = 10,      
+					[9] = false,      
+					[10] = true,      
+					[11] = Vector3.new(),      
+					[12] = 16868,      
+					[13] = Vector3.new()      
+				}  
+				for i = 1, 1, 1 do 
+					game:GetService("ReplicatedStorage").Events.HitPart:FireServer(unpack(Arguments))
+				end
+			end
+		end)
+	else
+		_G.DisableLoopKill = true
+	end
+end})
 
 
-
-MiscSection:AddToggle({text = "Kill All"}):AddBind({flag = "Kill All Key", mode = "Toggle", key = "K"})
+MiscSection:AddToggle({text = "Kill All"})
 game:GetService("RunService").RenderStepped:Connect(function()
 	if library.flags["Kill All"] == true and library.flags["Kill All Key"] == true and LocalPlayer.Character:FindFirstChild("UpperTorso") and LocalPlayer.Character:FindFirstChild("Gun") then
 		for _,Player in pairs(Players:GetPlayers()) do

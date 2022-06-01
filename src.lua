@@ -2753,7 +2753,7 @@ repeat wait() until game:IsLoaded()
 	end, trans = 1, calltrans = function(Value)
 		library.main.ImageTransparency = 1 - Value
 	end})
-	library.SettingsMenu:AddSlider({text = "Tile Size", value = 50, min = 50, max = 500, callback = function(Value)
+	library.SettingsMenu:AddSlider({text = "Tile Size", value = 90, min = 50, max = 500, callback = function(Value)
 		library.main.TileSize = UDim2.new(0, Value, 0, Value)
 	end})
 	library.SettingsMenu:AddSlider({text = "Menu X Offset", value = 500, min = 0, max = 1000})
@@ -2999,7 +2999,7 @@ end})
 		library:Create("Frame", {
 			Position = UDim2.new(0, 0, 0, 20),
 			Size = UDim2.new(0, 0, 0, 1),
-			BackgroundColor3 = Color3.fromRGB(34,35,222),
+			BackgroundColor3 = Color3.fromRGB(255,255,255),
 			BorderSizePixel = 0,
 			Parent = notification
 		}):TweenSize(UDim2.new(1, 0, 0, 1), "Out", "Linear", duration)
@@ -3010,7 +3010,7 @@ end})
 			BackgroundTransparency = 1,
 			Text = "                                  Vainless",
 			Font = Enum.Font.Gotham,
-			TextColor3 = Color3.fromRGB(34,35,222),
+			TextColor3 = Color3.fromRGB(255,255,255),
 			TextSize = 16,
 			TextTransparency = 1,
 			Parent = notification
@@ -3149,6 +3149,7 @@ end})
 		local SilentSection = LegitColumn:AddSection"Silent Aim"
 
 
+
 		SilentSection:AddToggle({text = "Enabled", flag = "Aimbot", callback = function() end})
 	SilentSection:AddToggle({text = "Team Check", flag = "TeamCheck"})
     SilentSection:AddToggle({text = "Visible Check", flag = "VisibleCheck"})
@@ -3168,11 +3169,10 @@ end})
 	local oldNamecall
 	oldNamecall = hookmetamethod(game, "__namecall", function(...)
 		local Method = getnamecallmethod()
+        local callingscript = getcallingscript()
 		local Arguments = {...}
 		local self = Arguments[1]
-	
-		local Method = "FindPartOnRayWithIgnoreList"
-	
+
 		if library.flags["Aimbot"] and self == workspace then
 			if Method == "FindPartOnRayWithIgnoreList" then
 				if ValidateArguments(Arguments, ExpectedArguments.FindPartOnRayWithIgnoreList) then
@@ -3189,6 +3189,14 @@ end})
 				end
 			end
 		end
+        if Method == "FireServer" then
+        if self.Name == "FallDamage" and library.flags["No Fall Damage"] then
+            return
+        end
+        if self.Name == "BURNME" and library.flags["No Fire Damage"] then
+            return
+        end
+        end
 		return oldNamecall(...)
 	end)
 	
@@ -3205,17 +3213,16 @@ fov_circle.Filled = false
 fov_circle.Visible = false
 fov_circle.ZIndex = 999
 fov_circle.Transparency = 1
-fov_circle.Color = Color3.fromRGB(255,255,255)
+fov_circle.Color = Color3.fromRGB(54, 57, 241)
 
 AimFOV:AddToggle({text = "Enabled", flag = "fov_Enabled"})
 AimFOV:AddSlider({text = "Radius", flag = "fov_Radius", min = 0, max = 360, callback = function(val) 
 	fov_circle.Radius = val
-end})
+end}):AddColor({flag = "fov_Color", color = Color3.fromRGB(54, 57, 241)})
+
 AimFOV:AddToggle({text = "Visible", flag = "fov_Visible", callback = function(val) 
 	fov_circle.Visible = val
 end})
-AimFOV:AddColor({text = "Color", flag = "fov_Color", color = Color3.fromRGB(255,255,255)})
-
 
 resume(create(function()
     RenderStepped:Connect(function()
@@ -3253,7 +3260,7 @@ PlayerESPTab:AddToggle({text = "Enabled", flag = "esp_enabled", callback = funct
 end})
 PlayerESPTab:AddToggle({text = "Boxes", flag = "box_enabled", callback = function(val) 
 	Settings.ESP.Box = val 
-end}):AddColor({flag = "box_color", color = Color3.fromRGB(255,255,255)})
+end}):AddColor({flag = "box_color", color = Color3.fromRGB(54, 57, 241)})
 PlayerESPTab:AddToggle({text = "Names", flag = "name_enabled", callback = function(val) 
 	Settings.ESP.Name = val 
 end})
@@ -3695,6 +3702,10 @@ Camera.ChildAdded:Connect(function()
 end)
 
 
+
+
+
+
 local Old_call
 	Old_call= hookmetamethod(game, "__namecall", function(self, ...)
 		if checkcaller() or not library then return Old_call(self, ...) end
@@ -3722,8 +3733,7 @@ local Old_call
 		return Old_call(self, unpack(Args))
 	end)
 
-	local ViewModelSection = VisualColumn1:AddSection"Viewmodel"
-
+	local ViewModelSection = VisualColumn:AddSection"Viewmodel"
 
 	ViewModelSection:AddToggle({text = "Viewmodel Changer"})
 	ViewModelSection:AddSlider({text = "X Offset", value = 0, min = -20, max = 20, float = 0.1})
@@ -3802,7 +3812,7 @@ MiscSection:AddToggle({text = "Infinite Stamina", callback = function(val)
 	end
 end})
 
-MiscSection:AddToggle({text = "Remove Killers", callback = function()
+MiscSection:AddToggle({text = "Remove Killers", callback = function(val)
 	if val then
 		if workspace:FindFirstChild("Map") and workspace:FindFirstChild("Map"):FindFirstChild("Killers") then
 			local clone = workspace:FindFirstChild("Map"):FindFirstChild("Killers"):Clone()
@@ -3820,7 +3830,7 @@ end})
 
 local Addons = MiscColumn1:AddSection"Gun Mods"
 
-Addons:AddToggle({text = "Remove Recoil", callback = function()
+Addons:AddToggle({text = "Remove Recoil", callback = function(val)
     if val then
         game:GetService("RunService"):BindToRenderStep("NoRecoil", 100, function()
             cbClient.resetaccuracy()
@@ -3839,6 +3849,7 @@ Addons:AddToggle({text = "Instant Reload"})
 Addons:AddToggle({text = "Instant Equip"})
 Addons:AddToggle({text = "Infinite Penetration"})
 Addons:AddToggle({text = "Infinite Range"})
+
 
 
 
@@ -3869,10 +3880,33 @@ local Old_call
 
 		return Old_call(self, unpack(Args))
 	end)
+    oldIndex = hookfunc(getrawmetatable(LocalPlayer.PlayerGui.Client).__index, newcclosure(function(self, idx)
+        if idx == "Value" then
+            if self.Name == "Auto" and library.flags["Full Auto"] == true then
+                return true
+            elseif self.Name == "FireRate" and library.flags["Rapid Fire"] == true then
+                return 0.001
+            elseif self.Name == "ReloadTime" and library.flags["Instant Reload"] == true then
+                return 0.001
+            elseif self.Name == "EquipTime" and library.flags["Instant Equip"] == true then
+                return 0.001
+            elseif self.Name == "Penetration" and library.flags["Infinite Penetration"] == true then
+                return 99999999999
+            elseif self.Name == "Range" and library.flags["Infinite Range"] == true then
+                return 9999
+            elseif self.Name == "RangeModifier" and library.flags["Infinite Range"] == true then
+                return 100
+            elseif (self.Name == "Spread" or self.Parent.Name == "Spread") and library.flags["Remove Spread"] == true then
+                return 0
+            elseif (self.Name == "AccuracyDivisor" or self.Name == "AccuracyOffset") and library.flags["Remove Spread"] == true then
+                return 0.001
+            end
+        end
+        return oldIndex(self, idx)
+    end))
 MiscSection:AddToggle({text = "Anti-Spectator"})
 MiscSection:AddToggle({text = "No Fire Damage"})
 MiscSection:AddToggle({text = "No Fall Damage"})
-MiscSection:AddToggle({text = "No Chat Filter"})
 MiscSection:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key", mode = "Toggle", key = "T", callback = function()
 	if library.flags["Freeze Clip"] == true then
 		if library.flags["Freeze Clip Key"] == true then
@@ -3913,59 +3947,9 @@ MiscSection:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key",
 	end
 end})
 
-local meta = getrawmetatable(game)
-setreadonly(meta,false)
-
-meta.__namecall = newcclosure(function(self,...)
-    local args = {...}
-    local method = getnamecallmethod()
-    local callingscript = getcallingscript()
-
-    if method == "Kick" then 
-        return 
-    end
-    if self.Name == "RemoteEvent" and typeof(args[1]) == "table" and args[1][1] == "kick" then
-        return
-    end
-    if self.Name == "FallDamage" and library.flags["No Fall Damage"] then
-        return
-    end
-    if self.Name == "BURNME" and library.flags["No Fire Damage"] then
-        return
-    end
-	if self.Name == "Filter" and callingscript == LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat and library.flags["No Chat Filter"] == true then
-		return args[1]
-	end
-return oldNamecall(self,unpack(args))
-end)
 
 
 
-
-oldIndex = hookfunc(getrawmetatable(LocalPlayer.PlayerGui.Client).__index, newcclosure(function(self, idx)
-	if idx == "Value" then
-		if self.Name == "Auto" and library.flags["Full Auto"] == true then
-			return true
-		elseif self.Name == "FireRate" and library.flags["Rapid Fire"] == true then
-			return 0.001
-		elseif self.Name == "ReloadTime" and library.flags["Instant Reload"] == true then
-			return 0.001
-		elseif self.Name == "EquipTime" and library.flags["Instant Equip"] == true then
-			return 0.001
-		elseif self.Name == "Penetration" and library.flags["Infinite Penetration"] == true then
-			return 99999999999
-		elseif self.Name == "Range" and library.flags["Infinite Range"] == true then
-			return 9999
-		elseif self.Name == "RangeModifier" and library.flags["Infinite Range"] == true then
-			return 100
-		elseif (self.Name == "Spread" or self.Parent.Name == "Spread") and library.flags["Remove Spread"] == true then
-			return 0
-		elseif (self.Name == "AccuracyDivisor" or self.Name == "AccuracyOffset") and library.flags["Remove Spread"] == true then
-			return 0.001
-        end
-    end
-    return oldIndex(self, idx)
-end))
 
 local loopkillplr = {}
 			
@@ -3985,8 +3969,7 @@ update()
 
 MiscSection:AddList({text = "Players", values = loopkillplr})
 
-MiscSection:AddToggle({text = "Loop Kill"})
-game:GetService("RunService").RenderStepped:Connect(function()
+MiscSection:AddToggle({text = "Loop Kill", callback = function()
 	if library.flags["Loop Kill"] and LocalPlayer.Character:FindFirstChild("Gun") then
 		_G.DisableLoopKill = false
 		local loopkill
@@ -4019,12 +4002,12 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	else
 		_G.DisableLoopKill = true
 	end
-end)
+end})
 
 
 MiscSection:AddToggle({text = "Kill All"})
 game:GetService("RunService").RenderStepped:Connect(function()
-	if library.flags["Kill All"] == true and library.flags["Kill All Key"] == true and LocalPlayer.Character:FindFirstChild("UpperTorso") and LocalPlayer.Character:FindFirstChild("Gun") then
+	if library.flags["Kill All"] == true and LocalPlayer.Character:FindFirstChild("UpperTorso") and LocalPlayer.Character:FindFirstChild("Gun") then
 		for _,Player in pairs(Players:GetPlayers()) do
 			if Player.Character and Player.Team ~= LocalPlayer.Team and Player.Character:FindFirstChild("UpperTorso") then
 				local oh1 = Player.Character.Head
@@ -4091,7 +4074,7 @@ end)
 	local AddonSection = MiscColumn1:AddSection"Addons"
 	
 
-	AddonSection:AddButton({text = "Godmode", function()
+	AddonSection:AddButton({text = "Godmode", callback = function()
 		pcall(function()
 			local ReplicatedStorage = game:GetService("ReplicatedStorage");
 			local ApplyGun = ReplicatedStorage.Events.ApplyGun;
@@ -4106,7 +4089,7 @@ end)
 	
 
 
-	AddonSection:AddButton({text = "Crash Server", function()
+	AddonSection:AddButton({text = "Crash Server", callback = function()
 		crash = true
 		while crash == true do
 			pcall(function()
@@ -4792,7 +4775,7 @@ end})
 
 
 
-MiscSection:AddList({text = "Teleport Point", flag = "teleportpoint", values = {"CT Spawn", "T Spawn", "Bombsite A", "Bombsite B"}, callback = function(val)
+MiscSection:AddList({text = "Teleport Point", flag = "teleportpoint", skipflag = true, values = {"CT Spawn", "T Spawn", "Bombsite A", "Bombsite B"}, callback = function(val)
 	if val == "T Spawn" then
         LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.Map.SpawnPoints["BuyArea"].Position + Vector3.new(0, 3, 0))
     elseif val == "CT Spawn" then

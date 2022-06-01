@@ -2722,7 +2722,7 @@ repeat wait() until game:IsLoaded()
 
 	library.SettingsMenu = library.SettingsColumn:AddSection"Menu"
 	library.SettingsMenu:AddBind({text = "Open / Close", flag = "UI Toggle", nomouse = true, key = "Insert", callback = function() library:Close() end})
-	library.SettingsMenu:AddColor({text = "Accent Color", flag = "Menu Accent Color", color = Color3.fromRGB(34,35,222), callback = function(Color)
+	library.SettingsMenu:AddColor({text = "Accent Color", flag = "Menu Accent Color", color = Color3.fromRGB(255,255,255), callback = function(Color)
 		if library.currentTab then
 			library.currentTab.button.TextColor3 = Color
 		end
@@ -2748,12 +2748,12 @@ repeat wait() until game:IsLoaded()
 		if Backgrounds[Value] then
 			library.main.Image = "rbxassetid://" .. Backgrounds[Value]
 		end
-	end}):AddColor({flag = "Menu Background Color", color = Color3.new(), callback = function(Color)
+	end}):AddColor({flag = "Menu Background Color", color = Color3.fromRGB(172,171,171), callback = function(Color)
 		library.main.ImageColor3 = Color
 	end, trans = 1, calltrans = function(Value)
 		library.main.ImageTransparency = 1 - Value
 	end})
-	library.SettingsMenu:AddSlider({text = "Tile Size", value = 90, min = 50, max = 500, callback = function(Value)
+	library.SettingsMenu:AddSlider({text = "Tile Size", value = 50, min = 50, max = 500, callback = function(Value)
 		library.main.TileSize = UDim2.new(0, Value, 0, Value)
 	end})
 	library.SettingsMenu:AddSlider({text = "Menu X Offset", value = 500, min = 0, max = 1000})
@@ -3149,7 +3149,6 @@ end})
 		local SilentSection = LegitColumn:AddSection"Silent Aim"
 
 
-
 		SilentSection:AddToggle({text = "Enabled", flag = "Aimbot", callback = function() end})
 	SilentSection:AddToggle({text = "Team Check", flag = "TeamCheck"})
     SilentSection:AddToggle({text = "Visible Check", flag = "VisibleCheck"})
@@ -3206,16 +3205,17 @@ fov_circle.Filled = false
 fov_circle.Visible = false
 fov_circle.ZIndex = 999
 fov_circle.Transparency = 1
-fov_circle.Color = Color3.fromRGB(54, 57, 241)
+fov_circle.Color = Color3.fromRGB(255,255,255)
 
 AimFOV:AddToggle({text = "Enabled", flag = "fov_Enabled"})
 AimFOV:AddSlider({text = "Radius", flag = "fov_Radius", min = 0, max = 360, callback = function(val) 
 	fov_circle.Radius = val
-end}):AddColor({flag = "fov_Color", color = Color3.fromRGB(54, 57, 241)})
-
+end})
 AimFOV:AddToggle({text = "Visible", flag = "fov_Visible", callback = function(val) 
 	fov_circle.Visible = val
 end})
+AimFOV:AddColor({text = "Color", flag = "fov_Color", color = Color3.fromRGB(255,255,255)})
+
 
 resume(create(function()
     RenderStepped:Connect(function()
@@ -3253,7 +3253,7 @@ PlayerESPTab:AddToggle({text = "Enabled", flag = "esp_enabled", callback = funct
 end})
 PlayerESPTab:AddToggle({text = "Boxes", flag = "box_enabled", callback = function(val) 
 	Settings.ESP.Box = val 
-end}):AddColor({flag = "box_color", color = Color3.fromRGB(54, 57, 241)})
+end}):AddColor({flag = "box_color", color = Color3.fromRGB(255,255,255)})
 PlayerESPTab:AddToggle({text = "Names", flag = "name_enabled", callback = function(val) 
 	Settings.ESP.Name = val 
 end})
@@ -3639,10 +3639,60 @@ oldNewIndex = hookfunc(getrawmetatable(game.Players.LocalPlayer.PlayerGui.Client
 end))
 
 
+function hasProperty(ins,pro)
+    return pcall(function() _=ins[pro] end)
+end
+
+function updateViewmodel()
+    if Camera:FindFirstChild("Arms") then
+        local arms = Camera.Arms
+        for i,v in next, arms:GetChildren() do
+            if library.flags["weapon_chams"] then
+                if (v:IsA("MeshPart") or v.Name == "Part") and v.Transparency ~= 1 then
+                    if v.Name == "StatClock" then v:ClearAllChildren() end
+                    v.Color = library.flags["weapon_color"]
+                    v.Transparency = library.flags["weapon_trans"]/100
+                    v.Material = library.flags["weapon_material"]
+                    if hasProperty(v,"TextureID") then v.TextureID = "" end
+				end
+			end
+					if v:IsA"Model" then
+						for _i,_v in next, v:GetDescendants() do
+							if library.flags["remove_sleeves"] and _v.Name == "Sleeve" then
+								_v:Destroy()
+							end
+							if library.flags["arm_chams"] then
+								if hasProperty(_v,"CastShadow") then _v.CastShadow = false end
+								if _v:IsA"SpecialMesh" then
+									local clr = library.flags["arm_color"]
+									_v.VertexColor = Vector3.new(clr.R,clr.G,clr.B)
+								end
+								if _v:IsA"Part" then
+									_v.Material = library.flags["arm_material"]
+									_v.Transparency = library.flags["arm_trans"]/100
+									_v.Color = library.flags["arm_color"]
+									if _v.Transparency == 1 then continue end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+VisualSection:AddToggle({text = "Weapon Chams", flag = "weapon_chams", callback = updateViewmodel}):AddColor({flag = "weapon_color", callback = updateViewmodel})
+VisualSection:AddSlider({text = "Weapon Chams Transparency", flag = "weapon_trans", min = 0, max = 100, callback = updateViewmodel})
+VisualSection:AddList({text = "Weapon Material", flag = "weapon_material", values = {"SmoothPlastic", "Neon", "ForceField", "Glass"}, callback = updateViewmodel})
+
+VisualSection:AddToggle({text = "Remove Sleeves", flag = "remove_sleeves", callback = updateViewmodel})
+VisualSection:AddToggle({text = "Arm Chams", flag = "arm_chams", callback = updateViewmodel}):AddColor({flag = "arm_color", callback = updateViewmodel})
+VisualSection:AddSlider({text = "Arm Chams Transparency", flag = "arm_trans", min = 0, max = 100, callback = updateViewmodel})
+VisualSection:AddList({text = "Arm Material", flag = "arm_material", values = {"SmoothPlastic", "Neon", "ForceField", "Glass"}, callback = updateViewmodel})
 
 
-
-
+Camera.ChildAdded:Connect(function()
+    updateViewmodel()
+end)
 
 
 local Old_call
@@ -3673,6 +3723,7 @@ local Old_call
 	end)
 
 	local ViewModelSection = VisualColumn1:AddSection"Viewmodel"
+
 
 	ViewModelSection:AddToggle({text = "Viewmodel Changer"})
 	ViewModelSection:AddSlider({text = "X Offset", value = 0, min = -20, max = 20, float = 0.1})
@@ -3821,8 +3872,8 @@ local Old_call
 MiscSection:AddToggle({text = "Anti-Spectator"})
 MiscSection:AddToggle({text = "No Fire Damage"})
 MiscSection:AddToggle({text = "No Fall Damage"})
-MiscSection:AddToggle({text = "Always Chat Alive"})
-MiscSection:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key", mode = "toggle", key = "T", callback = function()
+MiscSection:AddToggle({text = "No Chat Filter"})
+MiscSection:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key", mode = "Toggle", key = "T", callback = function()
 	if library.flags["Freeze Clip"] == true then
 		if library.flags["Freeze Clip Key"] == true then
 			local Freto = Instance.new("Part")
@@ -3862,6 +3913,59 @@ MiscSection:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key",
 	end
 end})
 
+local meta = getrawmetatable(game)
+setreadonly(meta,false)
+
+meta.__namecall = newcclosure(function(self,...)
+    local args = {...}
+    local method = getnamecallmethod()
+    local callingscript = getcallingscript()
+
+    if method == "Kick" then 
+        return 
+    end
+    if self.Name == "RemoteEvent" and typeof(args[1]) == "table" and args[1][1] == "kick" then
+        return
+    end
+    if self.Name == "FallDamage" and library.flags["No Fall Damage"] then
+        return
+    end
+    if self.Name == "BURNME" and library.flags["No Fire Damage"] then
+        return
+    end
+	if self.Name == "Filter" and callingscript == LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat and library.flags["No Chat Filter"] == true then
+		return args[1]
+	end
+return oldNamecall(self,unpack(args))
+end)
+
+
+
+
+oldIndex = hookfunc(getrawmetatable(LocalPlayer.PlayerGui.Client).__index, newcclosure(function(self, idx)
+	if idx == "Value" then
+		if self.Name == "Auto" and library.flags["Full Auto"] == true then
+			return true
+		elseif self.Name == "FireRate" and library.flags["Rapid Fire"] == true then
+			return 0.001
+		elseif self.Name == "ReloadTime" and library.flags["Instant Reload"] == true then
+			return 0.001
+		elseif self.Name == "EquipTime" and library.flags["Instant Equip"] == true then
+			return 0.001
+		elseif self.Name == "Penetration" and library.flags["Infinite Penetration"] == true then
+			return 99999999999
+		elseif self.Name == "Range" and library.flags["Infinite Range"] == true then
+			return 9999
+		elseif self.Name == "RangeModifier" and library.flags["Infinite Range"] == true then
+			return 100
+		elseif (self.Name == "Spread" or self.Parent.Name == "Spread") and library.flags["Remove Spread"] == true then
+			return 0
+		elseif (self.Name == "AccuracyDivisor" or self.Name == "AccuracyOffset") and library.flags["Remove Spread"] == true then
+			return 0.001
+        end
+    end
+    return oldIndex(self, idx)
+end))
 
 local loopkillplr = {}
 			
@@ -3881,7 +3985,8 @@ update()
 
 MiscSection:AddList({text = "Players", values = loopkillplr})
 
-MiscSection:AddToggle({text = "Loop Kill", callback = function()
+MiscSection:AddToggle({text = "Loop Kill"})
+game:GetService("RunService").RenderStepped:Connect(function()
 	if library.flags["Loop Kill"] and LocalPlayer.Character:FindFirstChild("Gun") then
 		_G.DisableLoopKill = false
 		local loopkill
@@ -3914,7 +4019,7 @@ MiscSection:AddToggle({text = "Loop Kill", callback = function()
 	else
 		_G.DisableLoopKill = true
 	end
-end})
+end)
 
 
 MiscSection:AddToggle({text = "Kill All"})

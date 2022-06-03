@@ -3255,185 +3255,238 @@ local VisualColumn = VisualsTab:AddColumn()
 local VisualColumn1 = VisualsTab:AddColumn()
 
 local PlayerESPTab = VisualColumn:AddSection"Players"
-PlayerESPTab:AddToggle({text = "Enabled", flag = "esp_enabled", callback = function(val) 
-	Settings.ESP.Enabled = val 
-end})
-PlayerESPTab:AddToggle({text = "Boxes", flag = "box_enabled", callback = function(val) 
-	Settings.ESP.Box = val 
-end}):AddColor({flag = "box_color", color = Color3.fromRGB(54, 57, 241)})
-PlayerESPTab:AddToggle({text = "Names", flag = "name_enabled", callback = function(val) 
-	Settings.ESP.Name = val 
-end})
-PlayerESPTab:AddToggle({text = "Weapons", flag = "weapons_enabled", callback = function(val) 
-	Settings.ESP.Gun = val 
-end})
+
+PlayerESPTab:AddToggle({text = "Enabled", flag = "esp_enabled"})
+PlayerESPTab:AddToggle({text = "Boxes", flag = "box_enabled"}):AddColor({flag = "box_color", color = Color3.fromRGB(255, 255, 255)})
+PlayerESPTab:AddToggle({text = "Names", flag = "name_enabled"}):AddColor({flag = "name_color", color = Color3.fromRGB(255, 255, 255)})
+PlayerESPTab:AddToggle({text = "Health Bar", flag = "health_enabled"}):AddColor({flag = "health_color", color = Color3.fromRGB(0, 255, 26)})
+PlayerESPTab:AddToggle({text = "Weapon", flag = "weapon_enabled"}):AddColor({flag = "weapon1_color", color = Color3.fromRGB(255, 255, 255)})
+PlayerESPTab:AddToggle({text = "Out Of FOV", flag = "OOF_enabled"}):AddColor({flag = "OOF_color", color = Color3.fromRGB(255, 255, 255)})
+
+
+local PlayerDrawings = {}
+local Utility        = {}
+
+Utility.Settings = {
+    Line = {
+        Thickness = 1,
+        Color = Color3.fromRGB(0, 255, 0)
+    },
+    Text = {
+        Size = 13,
+        Center = true,
+        Outline = true,
+        Font = Drawing.Fonts.Plex,
+        Color = Color3.fromRGB(255, 255, 255)
+    },
+    Square = {
+        Thickness = 1,
+        Color = library.flags["box_color"],
+        Filled = false,
+    },
+    Triangle = {
+        Color = Color3.fromRGB(255, 255, 255),
+        Filled = true,
+        Visible = false,
+        Thickness = 1,
+    }
+}
+function Utility.New(Type, Outline, Name)
+    local drawing = Drawing.new(Type)
+    for i, v in pairs(Utility.Settings[Type]) do
+        drawing[i] = v
+    end
+    if Outline then
+        drawing.Color = Color3.new(0,0,0)
+        drawing.Thickness = 3
+    end
+    return drawing
+end
+function Utility.Add(Player)
+    if not PlayerDrawings[Player] then
+        PlayerDrawings[Player] = {
+            Offscreen = Utility.New("Triangle", nil, "Offscreen"),
+            Name = Utility.New("Text", nil, "Name"),
+            Tool = Utility.New("Text", nil, "Tool"),
+            BoxOutline = Utility.New("Square", true, "BoxOutline"),
+            Box = Utility.New("Square", nil, "Box"),
+            HealthOutline = Utility.New("Line", true, "HealthOutline"),
+            Health = Utility.New("Line", nil, "Health")
+        }
+    end
+end
+
+for _,Player in pairs(Players:GetPlayers()) do
+    if Player ~= LocalPlayer then
+        Utility.Add(Player)
+    end
+end
+Players.PlayerAdded:Connect(Utility.Add)
+Players.PlayerRemoving:Connect(function(Player)
+    if PlayerDrawings[Player] then
+        for i,v in pairs(PlayerDrawings[Player]) do
+            if v then
+                v:Remove()
+            end
+        end
+
+        PlayerDrawings[Player] = nil
+    end
+end)
 
 
 
-local function amogazenzESP(v)
-    local BoxOutline = Drawing.new("Square")
-    BoxOutline.Visible = false
-    BoxOutline.Color = Color3.new(0,0,0)
-    BoxOutline.Thickness = 3
-    BoxOutline.Transparency = 1
-    BoxOutline.Filled = false
+local ESPLoop = game:GetService("RunService").RenderStepped:Connect(function()
+    for _,Player in pairs (Players:GetPlayers()) do
+        local PlayerDrawing = PlayerDrawings[Player]
+        if not PlayerDrawing then continue end
 
-    local Box = Drawing.new("Square")
-    Box.Visible = false
-    Box.Color = Color3.new(1,1,1)
-    Box.Thickness = 1
-    Box.Transparency = 1
-    Box.Filled = false
+        for _,Drawing in pairs (PlayerDrawing) do
+            Drawing.Visible = false
+        end
 
-    local HealthBarOutline = Drawing.new("Square")
-    HealthBarOutline.Thickness = 3
-    HealthBarOutline.Filled = false
-    HealthBarOutline.Color = Color3.new(0,0,0)
-    HealthBarOutline.Transparency = 1
-    HealthBarOutline.Visible = false
+        if not library.flags["esp_enabled"] then continue end
 
-    local HealthBar = Drawing.new("Square")
-    HealthBar.Thickness = 1
-    HealthBar.Filled = false
-    HealthBar.Transparency = 1
-    HealthBar.Visible = false
+        local Character = Player.Character
+        local RootPart, Humanoid = Character and Character:FindFirstChild("HumanoidRootPart"), Character and Character:FindFirstChildOfClass("Humanoid")
+        if not Character or not RootPart or not Humanoid then continue end
 
-    local Tracer = Drawing.new("Line")
-    Tracer.Visible = false
-    Tracer.Color = Color3.new(1,1,1)
-    Tracer.Thickness = 1
-    Tracer.Transparency = 1
+        local DistanceFromCharacter = (Camera.CFrame.Position - RootPart.Position).Magnitude
+        if 1000 < DistanceFromCharacter then continue end
 
-    local Name = Drawing.new("Text")
-    Name.Transparency = 1
-    Name.Visible = false
-    Name.Color = Color3.new(1,1,1)
-    Name.Size = 12
-    Name.Center = true
-    Name.Outline = true
+        local Pos, OnScreen = Camera:WorldToViewportPoint(RootPart.Position)
+        if not OnScreen then
+            if not library.flags["OOF_enabled"] then continue end
+            if Player.Team == LocalPlayer.Team then continue end
 
+            local RootPos = RootPart.Position
+            local CameraVector = Camera.CFrame.Position
+            local LookVector = Camera.CFrame.LookVector
 
-    local Gun = Drawing.new("Text")
-    Gun.Transparency = 1
-    Gun.Visible = false
-    Gun.Color = Color3.new(1,1,1)
-    Gun.Size = 12
-    Gun.Center = true
-    Gun.Outline = true
+            local Dot = LookVector:Dot(RootPart.Position - Camera.CFrame.Position)
+            if Dot <= 0 then
+                RootPos = (CameraVector + ((RootPos - CameraVector) - ((LookVector * Dot) * 1.01)))
+            end
 
+            local ScreenPos, OnScreen = Camera:WorldToScreenPoint(RootPos)
+            if not OnScreen then
+                local Drawing = PlayerDrawing.Offscreen
+                local FOV     = 800 - 400
+                local Size    = 15
 
-    game:GetService("RunService").RenderStepped:Connect(function()
-        if v.Character ~= nil and v.Character:FindFirstChild("Humanoid") ~= nil and v.Character:FindFirstChild("HumanoidRootPart") ~= nil and v ~= LocalPlayer and v.Character.Humanoid.Health > 0 then
-            local Vector, onScreen = Camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
-            local Distance = (Camera.CFrame.p - v.Character.HumanoidRootPart.Position).Magnitude
-            local RootPart = v.Character.HumanoidRootPart
-            local Head = v.Character.Head
-            local RootPosition, RootVis = WorldToViewportPoint(Camera, RootPart.Position)
-            local HeadPosition = WorldToViewportPoint(Camera, Head.Position + Vector3.new(0,0.5,0))
-            local LegPosition = WorldToViewportPoint(Camera, RootPart.Position - Vector3.new(0,3,0))
+                local Center = (Camera.ViewportSize / 2)
+                local Direction = (Vector2.new(ScreenPos.X, ScreenPos.Y) - Center).Unit
+                local Radian = math.atan2(Direction.X, Direction.Y)
+                local Angle = (((math.pi * 2) / FOV) * Radian)
+                local ClampedPosition = (Center + (Direction * math.min(math.abs(((Center.Y - FOV) / math.sin(Angle)) * FOV), math.abs((Center.X - FOV) / (math.cos(Angle)) / 2))))
+                local Point = Vector2.new(math.floor(ClampedPosition.X - (Size / 2)), math.floor((ClampedPosition.Y - (Size / 2) - 15)))
 
-            if onScreen then
-                if Settings.ESP.Enabled and Settings.ESP.Box then
-                    BoxOutline.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
-                    BoxOutline.Visible = true
+                local function Rotate(point, center, angle)
+                    angle = math.rad(angle)
+                    local rotatedX = math.cos(angle) * (point.X - center.X) - math.sin(angle) * (point.Y - center.Y) + center.X
+                    local rotatedY = math.sin(angle) * (point.X - center.X) + math.cos(angle) * (point.Y - center.Y) + center.Y
 
-                    Box.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
-                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
-                    Box.Color = library.flags["box_color"]
-                    Box.Visible = true
-
-                    HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
-                    HealthBarOutline.Position = BoxOutline.Position - Vector2.new(6,0)
-                    HealthBarOutline.Visible = true
-
-                    HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (v.Character.Humanoid.MaxHealth / math.clamp(v.Character.Humanoid.Health, 0,v.Character.Humanoid.MaxHealth)))
-                    HealthBar.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1 / HealthBar.Size.Y))
-                    HealthBar.Color = Color3.fromRGB(255 - 255 / (v.Character.Humanoid.MaxHealth / v.Character.Humanoid.Health), 255 / (v.Character.Humanoid.MaxHealth / v.Character.Humanoid.Health), 0)
-                    HealthBar.Visible = true
-
-                    if v.Team == game.Players.LocalPlayer.Team then
-                        HealthBarOutline.Visible = false
-                        BoxOutline.Visible = false
-                        Box.Visible = false
-                        HealthBar.Visible = false
-                    end
-                else
-                    BoxOutline.Visible = false
-                    Box.Visible = false
-                    HealthBarOutline.Visible = false
-                    HealthBar.Visible = false
+                    return Vector2.new(math.floor(rotatedX), math.floor(rotatedY))
                 end
 
-                if Settings.ESP.Tracers then
-                    Tracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 1)
+                local Rotation = math.floor(-math.deg(Radian)) - 47
+                Drawing.PointA = Rotate(Point + Vector2.new(Size, Size), Point, Rotation)
+                Drawing.PointB = Rotate(Point + Vector2.new(-Size, -Size), Point, Rotation)
+                Drawing.PointC = Rotate(Point + Vector2.new(-Size, Size), Point, Rotation)
+                Drawing.Color = library.flags["OOF_color"]
 
-                    Tracer.Color = Color3.new(1,1,1)
-                    Tracer.To = Vector2.new(Vector.X, Vector.Y)
-                    Tracer.Visible = true
+                Drawing.Filled = false
+                Drawing.Transparency = 1
 
-                    if v.Team == game.Players.LocalPlayer.Team then
-                        Tracer.Visible = false
-                    end
-                else
-                    Tracer.Visible = false
-                end
-				if Settings.ESP.Enabled and Settings.ESP.Gun then 
-					Gun.Font = 3
-                    Gun.Size = 16
-                    Gun.Text = tostring(v.Character.EquippedTool.Value)
-                    Gun.Position = Vector2.new(LegPosition.X, LegPosition.Y + 10)
-                    Gun.Color = Color3.new(1,1,1)
-                    Gun.Visible = true
-
-                    if v.Team == game.Players.LocalPlayer.Team then
-                        Gun.Visible = false
-                    end
-				else
-                    Gun.Visible = false
-                end
-
-                if Settings.ESP.Enabled and Settings.ESP.Name then
-                    Name.Text = tostring(v.Name)
-                    Name.Position = Vector2.new(workspace.Camera:WorldToViewportPoint(v.Character.Head.Position).X, workspace.Camera:WorldToViewportPoint(v.Character.Head.Position).Y - 30)
-                    Name.Visible = true
-                    Name.Size = 16
-                    Name.Color = Color3.new(1,1,1)
-                    Name.Font = 3
-
-                    if v.Team == game.Players.LocalPlayer.Team then
-                        Name.Visible = false
-                    end
-                else
-                    Name.Visible = false
-                end
-            else
-                BoxOutline.Visible = false
-                Box.Visible = false
-                HealthBarOutline.Visible = false
-                HealthBar.Visible = false
-                Tracer.Visible = false
-                Name.Visible = false
-                Gun.Visible = false
+                Drawing.Visible = true
             end
         else
-            BoxOutline.Visible = false
-            Box.Visible = false
-            HealthBarOutline.Visible = false
-            HealthBar.Visible = false
-            Tracer.Visible = false
-            Name.Visible = false
-            Gun.Visible = false
-        end
-    end)
-end
-for i,v in pairs(game.Players:GetChildren()) do
-    amogazenzESP(v)
-end
+            if Player.Team == LocalPlayer.Team then continue end
 
-game.Players.PlayerAdded:Connect(function(v)
-    amogazenzESP(v)
+            local Size           = (Camera:WorldToViewportPoint(RootPart.Position - Vector3.new(0, 3, 0)).Y - Camera:WorldToViewportPoint(RootPart.Position + Vector3.new(0, 2.6, 0)).Y) / 2
+            local BoxSize        = Vector2.new(math.floor(Size * 1.5), math.floor(Size * 1.9))
+            local BoxPos         = Vector2.new(math.floor(Pos.X - Size * 1.5 / 2), math.floor(Pos.Y - Size * 1.6 / 2))
+
+            local Name           = PlayerDrawing.Name
+            local Tool           = PlayerDrawing.Tool
+            local Distance       = PlayerDrawing.Distance
+            local Box            = PlayerDrawing.Box
+            local BoxOutline     = PlayerDrawing.BoxOutline
+            local Health         = PlayerDrawing.Health
+            local HealthOutline  = PlayerDrawing.HealthOutline
+
+            if library.flags["box_enabled"] then
+                Box.Size = BoxSize
+                Box.Position = BoxPos
+                Box.Visible = true
+                Box.Color = library.flags["box_color"]
+                BoxOutline.Size = BoxSize
+                BoxOutline.Position = BoxPos
+                BoxOutline.Visible = true
+            end
+
+            if library.flags["health_enabled"] then
+                Health.From = Vector2.new((BoxPos.X - 5), BoxPos.Y + BoxSize.Y)
+                Health.To = Vector2.new(Health.From.X, Health.From.Y - (Humanoid.Health / Humanoid.MaxHealth) * BoxSize.Y)
+                Health.Color = library.flags["health_color"]
+                Health.Visible = true
+
+                HealthOutline.From = Vector2.new(Health.From.X, BoxPos.Y + BoxSize.Y + 1)
+                HealthOutline.To = Vector2.new(Health.From.X, (Health.From.Y - 1 * BoxSize.Y) -1)
+                HealthOutline.Visible = true
+            end
+
+            local function SurroundString(String, Add)
+                local Left = ""
+                local Right = ""
+
+                local Remove = false
+                if Add == "[]" then
+                    String = string.gsub(String, "%[", "")
+                    String = string.gsub(String, "%[", "")
+
+                    Left = "["
+                    Right = "]"
+                elseif Add == "--" then
+                    Left = "-"
+                    Right = "-"
+                    Remove = true
+                elseif Add == "<>" then
+                    Left = "<"
+                    Right = ">"
+                    Remove = true
+                end
+                if Remove then
+                    String = string.gsub(String, Left, "")
+                    String = string.gsub(String, Right, "")
+                end
+
+                return Left..String..Right
+            end
+
+            if library.flags["name_enabled"] then
+                Name.Text = SurroundString(Player.Name, "<>")
+                Name.Position = Vector2.new(BoxSize.X / 2 + BoxPos.X, BoxPos.Y - 16)
+                Name.Color = library.flags["name_color"]
+                Name.Font = Drawing.Fonts["UI"]
+                Name.Visible = true
+            end
+
+            if library.flags["weapon_enabled"] then
+                local BottomOffset = BoxSize.Y + BoxPos.Y + 1
+                local Equipped = tostring(Player.Character.EquippedTool.Value)
+                Equipped = SurroundString(Equipped, "<>")
+                Tool.Text = Equipped
+                Tool.Position = Vector2.new(BoxSize.X/2 + BoxPos.X, BottomOffset)
+                Tool.Color = library.flags["weapon1_color"]
+                Tool.Font = Drawing.Fonts["UI"]
+                Tool.Visible = true
+                BottomOffset = BottomOffset + 15
+            end
+        end
+    end
 end)
+
 
 local ap = Instance.new("Folder", game.CoreGui)
 function chams(aq)
@@ -3644,6 +3697,8 @@ oldNewIndex = hookfunc(getrawmetatable(game.Players.LocalPlayer.PlayerGui.Client
 	end
     return oldNewIndex(self, idx, val)
 end))
+
+
 
 
 function hasProperty(ins,pro)
@@ -3907,6 +3962,73 @@ local Old_call
 MiscSection:AddToggle({text = "Anti-Spectator"})
 MiscSection:AddToggle({text = "No Fire Damage"})
 MiscSection:AddToggle({text = "No Fall Damage"})
+MiscSection:AddToggle({text = "Hitmarker"}):AddColor({color = Color3.fromRGB(255, 255, 255), flag = "hitmarker_color"})
+
+
+
+
+
+
+
+LocalPlayer.Additionals.TotalDamage:GetPropertyChangedSignal("Value"):Connect(function(current)
+    if current == 0 then return end
+    coroutine.wrap(function()
+        if library.flags["Hitmarker"] then
+            local Line = Drawing.new("Line")
+            local Line2 = Drawing.new("Line")
+            local Line3 = Drawing.new("Line")
+            local Line4 = Drawing.new("Line")
+
+            local x, y = Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2
+
+            Line.From = Vector2.new(x + 4, y + 4)
+            Line.To = Vector2.new(x + 10, y + 10)
+            Line.Color = library.flags["hitmarker_color"]
+            Line.Visible = true 
+
+            Line2.From = Vector2.new(x + 4, y - 4)
+            Line2.To = Vector2.new(x + 10, y - 10)
+            Line2.Color = library.flags["hitmarker_color"]
+            Line2.Visible = true 
+
+            Line3.From = Vector2.new(x - 4, y - 4)
+            Line3.To = Vector2.new(x - 10, y - 10)
+            Line3.Color = library.flags["hitmarker_color"]
+            Line3.Visible = true 
+
+            Line4.From = Vector2.new(x - 4, y + 4)
+            Line4.To = Vector2.new(x - 10, y + 10)
+            Line4.Color = library.flags["hitmarker_color"]
+            Line4.Visible = true
+
+            Line.Transparency = 1
+            Line2.Transparency = 1
+            Line3.Transparency = 1
+            Line4.Transparency = 1
+
+            Line.Thickness = 1
+            Line2.Thickness = 1
+            Line3.Thickness = 1
+            Line4.Thickness = 1
+
+            wait(0.3)
+            for i = 1,0,-0.1 do
+                wait()
+                Line.Transparency = i 
+                Line2.Transparency = i
+                Line3.Transparency = i
+                Line4.Transparency = i
+            end
+            Line:Remove()
+            Line2:Remove()
+            Line3:Remove()
+            Line4:Remove()
+        end
+    end)()
+end)
+
+
+
 MiscSection:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key", mode = "Toggle", key = "T", callback = function()
 	if library.flags["Freeze Clip"] == true then
 		if library.flags["Freeze Clip Key"] == true then
@@ -4029,47 +4151,28 @@ end)
 
 
 
-	MiscSection:AddToggle({text = "Bunny Hop"})
-
-	MiscSection:AddSlider({text = "Bhop Speed", min = 1, max = 30, value = 8})
-
-	local BodyVelocity = Instance.new("BodyVelocity")
-	local function YRotation(cframe)
-		local x, y, z = cframe:ToOrientation()
-		return CFrame.new(cframe.Position) * CFrame.Angles(0,y,0)
-	end
-	local function XYRotation(cframe)
-		local x, y, z = cframe:ToOrientation()
-		return CFrame.new(cframe.Position) * CFrame.Angles(x,y,0)
-	end
-	local BunnyHopDirect = "directional"
-    game:GetService("RunService").RenderStepped:Connect(function()
-		BodyVelocity:Destroy()
-		BodyVelocity = Instance.new("BodyVelocity")
-		BodyVelocity.MaxForce = Vector3.new(math.huge,0,math.huge)
-		
-		local CamCFrame = Camera.CFrame
-			if UserInputService:IsKeyDown("Space") and library.flags["Bunny Hop"] == true and IsAlive(LocalPlayer) then
-				local add = 0
-				local Root = LocalPlayer.Character.HumanoidRootPart
-				if BunnyHopDirect == "directional" then
-					if UserInputService:IsKeyDown("A") then add = 90 end
-					if UserInputService:IsKeyDown("S") then add = 190 end
-					if UserInputService:IsKeyDown("D") then add = 280 end
-					if UserInputService:IsKeyDown("A") and UserInputService:IsKeyDown("W") then add = 55 end
-					if UserInputService:IsKeyDown("D") and UserInputService:IsKeyDown("W") then add = 325 end
-					if UserInputService:IsKeyDown("D") and UserInputService:IsKeyDown("S") then add = 235 end
-					if UserInputService:IsKeyDown("A") and UserInputService:IsKeyDown("S") then add = 155 end
-				end
-				local rot = YRotation(CamCFrame) * CFrame.Angles(0,math.rad(add),0)
-				BodyVelocity.Parent = LocalPlayer.Character.UpperTorso
+	MiscSection:AddToggle({text = "Bunny Hop",flag = "bunny_hop",callback = function()
+		while library.flags["bunny_hop"] do RunService.RenderStepped:Wait()--wait()
+			if IsAlive(LocalPlayer) and UserInputService:IsKeyDown(Enum.KeyCode.Space) then
 				LocalPlayer.Character.Humanoid.Jump = true
-				BodyVelocity.Velocity = Vector3.new(rot.LookVector.X,0,rot.LookVector.Z) * (library.flags["Bhop Speed"] * 2)
-				if add == 0 and BunnyHopDirect == "directional" and not UserInputService:IsKeyDown("W") then
-					BodyVelocity:Destroy()
+				local speed = library.flags["bhop_speed"]
+				local dir = Camera.CFrame.LookVector * Vector3.new(1,0,1)
+				local move = Vector3.new()
+				move = UserInputService:IsKeyDown(Enum.KeyCode.W) and move + dir or move
+				move = UserInputService:IsKeyDown(Enum.KeyCode.S) and move - dir or move
+				move = UserInputService:IsKeyDown(Enum.KeyCode.D) and move + Vector3.new(-dir.Z,0,dir.X) or move
+				move = UserInputService:IsKeyDown(Enum.KeyCode.A) and move + Vector3.new(dir.Z,0,-dir.X) or move
+				if move.Unit.X == move.Unit.X then
+					move = move.Unit
+					LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(move.X*speed,LocalPlayer.Character.HumanoidRootPart.Velocity.Y,move.Z*speed)
 				end
 			end
-	end)
+		end
+	end})
+
+	MiscSection:AddSlider({text = "Bhop Speed", flag = "bhop_speed", min = 1, max = 50, value = 15})
+
+
 
 	local AddonSection = MiscColumn1:AddSection"Addons"
 	

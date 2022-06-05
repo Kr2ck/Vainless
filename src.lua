@@ -3139,8 +3139,10 @@ end})
 		local LegitTab = library:AddTab("Legit")
 		local VisualsTab = library:AddTab("Visuals")
 		local MiscTab = library:AddTab("Misc")
+		local SkinTab = library:AddTab("Skins")
 		local LuaTab = library:AddTab("Lua")
 		local LuaColumn1 = LuaTab:AddColumn()
+		local LuaColumn2 = LuaTab:AddColumn()
 		local LuaSection = LuaColumn1:AddSection"Lua"
 	
 		local LegitColumn = LegitTab:AddColumn()
@@ -4071,7 +4073,7 @@ end})
 
 
 
-
+local PlayerSection = MiscColumn:AddSection"Players"
 
 local loopkillplr = {}
 			
@@ -4080,6 +4082,7 @@ local Players = game:GetService("Players")
 function update() 
 	local CurrentPlayer = 0 
 	for i,v in next, Players:GetPlayers() do 
+		if v == LocalPlayer then continue end
 		CurrentPlayer = CurrentPlayer + 1 
 		table.insert(loopkillplr, v.Name)
 	end
@@ -4089,9 +4092,9 @@ Players.PlayerAdded:connect(update)
 Players.PlayerRemoving:connect(update)
 update()
 
-MiscSection:AddList({text = "Players", values = loopkillplr})
+PlayerSection:AddList({text = "Players", values = loopkillplr})
 
-MiscSection:AddToggle({text = "Loop Kill", callback = function()
+PlayerSection:AddToggle({text = "Loop Kill", callback = function()
 	if library.flags["Loop Kill"] and LocalPlayer.Character:FindFirstChild("Gun") then
 		_G.DisableLoopKill = false
 		local loopkill
@@ -4127,7 +4130,7 @@ MiscSection:AddToggle({text = "Loop Kill", callback = function()
 end})
 
 
-MiscSection:AddToggle({text = "Kill All"})
+PlayerSection:AddToggle({text = "Kill All"})
 game:GetService("RunService").RenderStepped:Connect(function()
 	if library.flags["Kill All"] == true and LocalPlayer.Character:FindFirstChild("UpperTorso") and LocalPlayer.Character:FindFirstChild("Gun") then
 		for _,Player in pairs(Players:GetPlayers()) do
@@ -4148,6 +4151,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		end
 	end
 end)
+PlayerSection:AddButton({text = "Refresh List", callback = update})
 
 
 
@@ -4171,8 +4175,6 @@ end)
 	end})
 
 	MiscSection:AddSlider({text = "Bhop Speed", flag = "bhop_speed", min = 1, max = 50, value = 15})
-
-
 
 	local AddonSection = MiscColumn1:AddSection"Addons"
 	
@@ -4843,20 +4845,24 @@ end})
 
 
 	getgenv().vainless = {}
-	vainless.AddButton = function(name, callback)
-		return LuaSection:AddButton({text = name, callback = callback})
+	function vainless:AddScript(title, side)
+		if side == "left" then
+		return LuaColumn1:AddSection(title)
+		elseif side == "right" then
+		return LuaColumn2:AddSection(title)
+		end
 	end
-	vainless.AddToggle = function(name, callback)
-		return LuaSection:AddToggle({text = name, callback = callback})
+	function vainless:AddButton(section1,options)
+		return section1:AddButton(options)
 	end
-	vainless.AddToggleBind = function(name, keyflag, mode, key, callback)
-		return LuaSection:AddToggle({text = name}):AddBind({flag = keyflag, mode = mode, key = key, callback = callback})
+	function vainless:AddToggle(section1,options)
+		return section1:AddToggle(options)
 	end
-	vainless.AddSlider = function(name, min, max, value, float, callback)
-		return LuaSection:AddSlider({text = name, min = min, max = max, value = value, float = float, callback = callback})
+	function vainless:AddSlider(section1,options)
+		return section1:AddSlider(options)
 	end
-	vainless.AddList = function(name, values, callback)
-		return LuaSection:AddList({text = name, values = values, callback = callback})
+	function vainless:AddList(section1,options)
+		return section1:AddList(options)
 	end
 
 
@@ -4873,6 +4879,7 @@ end})
 		loadstring(readfile("Vainless/lua\\"..library.flags["Luas"]))()  
 	end})
 	LuaSection:AddDivider("Scripts:")
+
 
 
 

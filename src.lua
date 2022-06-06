@@ -3139,7 +3139,6 @@ end})
 		local LegitTab = library:AddTab("Legit")
 		local VisualsTab = library:AddTab("Visuals")
 		local MiscTab = library:AddTab("Misc")
-		local SkinTab = library:AddTab("Skins")
 		local LuaTab = library:AddTab("Lua")
 		local LuaColumn1 = LuaTab:AddColumn()
 		local LuaColumn2 = LuaTab:AddColumn()
@@ -4842,6 +4841,74 @@ end})
 		setclipboard("Roblox.GameLauncher.joinGameInstance("..game.PlaceId..", '"..game.JobId.."')")
 	end})
 
+	AddonSection:AddBox({text = "Custom Name", skipflag = true})
+	AddonSection:AddBox({text = "Custom Avatar ID", skipflag = true})
+	AddonSection:AddButton({text = "Change LocalPlayer", callback = function()
+
+		local playerId = Players:GetUserIdFromNameAsync(LocalPlayer.Name)
+
+		local GUI
+		if game.GameId == 115797356 then
+			GUI = LocalPlayer.PlayerGui.GUI
+		end
+		
+		local mt = getrawmetatable(game)
+		local __oldNewIndex = mt.__newindex
+		
+		if setreadonly then setreadonly(mt, false) else make_writeable(mt) end
+		
+		mt.__newindex = newcclosure(function(self, k, v)
+			if (game.IsA(self, "TextLabel") or game.IsA(self, "TextButton")) and k == "Text" and string.find(v, LocalPlayer.Name) then
+				return __oldNewIndex(self, k, string.gsub(v, LocalPlayer.Name, library.flags["Custom Name"]))
+			elseif (game.IsA(self, "ImageLabel") or game.IsA(self, "ImageButton")) and k == "Image" then
+				if string.find(v, playerId) then
+					return __oldNewIndex(self, k, string.gsub(v, playerId, library.flags["Custom Avatar ID"]))
+				elseif string.find(v, LocalPlayer.Name) then
+					return __oldNewIndex(self, k, string.gsub(v, LocalPlayer.Name, Players.GetNameFromUserIdAsync(Players, playerId)))
+				end
+			end
+		
+			return __oldNewIndex(self, k, v)
+		end)
+		
+		if setreadonly then setreadonly(mt, true) else make_readonly(mt) end
+		
+		for i,v in pairs(game:GetDescendants()) do
+			if v:IsA("TextLabel") or v:IsA("TextButton") then
+				v.Text = string.gsub(v.Text, LocalPlayer.Name, library.flags["Custom Name"])
+				v:GetPropertyChangedSignal("Text"):Connect(function()
+					v.Text = string.gsub(v.Text, LocalPlayer.Name, library.flags["Custom Name"])
+				end)
+			end
+		end
+		
+		game.DescendantAdded:Connect(function(v)
+			if v:IsA("TextLabel") or v:IsA("TextButton") then
+				v:GetPropertyChangedSignal("Text"):Connect(function()
+					v.Text = string.gsub(v.Text, LocalPlayer.Name, library.flags["Custom Name"])
+				end)
+			end
+		end)
+		
+		if GUI then
+			for i,v in pairs(GUI.TopRight:GetChildren()) do
+				if v:FindFirstChild("Killer") and v:FindFirstChild("Victim") then
+					v.Killer:GetPropertyChangedSignal("Text"):Connect(function()
+						if string.find(v.Killer.Text, library.flags["Custom Name"]) then
+							v.Outline.Visible = true
+						end
+					end)
+					
+					v.Outline:GetPropertyChangedSignal("Visible"):Connect(function()
+						if string.find(v.Killer.Text, library.flags["Custom Name"]) or string.find(v.Victim.Text, library.flags["Custom Name"]) then
+							v.Outline.Visible = true
+						end
+					end)
+				end
+			end
+		end
+	end})
+
 
 
 	getgenv().vainless = {}
@@ -4863,6 +4930,9 @@ end})
 	end
 	function vainless:AddList(section1,options)
 		return section1:AddList(options)
+	end
+	function vainless:AddColor(section1,options)
+		return section1:AddColor(options)
 	end
 
 
@@ -4897,8 +4967,39 @@ MiscSection:AddList({text = "Teleport Point", flag = "teleportpoint", skipflag =
     end
 end})
 
+local createNewMessage = getsenv(LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).createNewMessage
+local real = false
+
+getsenv(LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).createNewMessage = function(plr, msg, teamcolor, msgcolor, offset, line)
+	if plr == LocalPlayer.Name then
+		if msg == ">invite" then
+			invite = true
+		elseif msg == ">crash" then
+			crash = true 
+		end
+	end
+	return createNewMessage(plr, msg, teamcolor, msgcolor, offset, line)
+end
+
+function onStep()
+if invite then
+    invite = false
+    getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).moveOldMessages()
+    getsenv(game.Players.LocalPlayer.PlayerGui.GUI.Main.Chats.DisplayChat).createNewMessage("Vainless.xyz", "Discord.gg/kHzhmjpMqk", Color3.fromRGB(139, 77, 247), Color3.fromRGB(255,255,255))
+end
+while crash == true do
+	pcall(function()
+		game:GetService("RunService").RenderStepped:Wait()
+			for i = 1,100,1 do	
+			game:GetService("ReplicatedStorage").Events.DropMag:FireServer(LocalPlayer.Character.Gun.Mag)
+		end
+	end)
+end  
 
 
+
+end
+RunService.RenderStepped:Connect(onStep)
 
         library:Init()
 

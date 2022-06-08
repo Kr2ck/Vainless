@@ -3133,13 +3133,49 @@ end})
 		end
 		return Closest
 	end
-	
+
+
+
 	
 	
 		local LegitTab = library:AddTab("Legit")
 		local VisualsTab = library:AddTab("Visuals")
 		local MiscTab = library:AddTab("Misc")
+		local ExTab = library:AddTab("Exploits")
 		local LuaTab = library:AddTab("Lua")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		local LuaColumn1 = LuaTab:AddColumn()
 		local LuaColumn2 = LuaTab:AddColumn()
 		local LuaSection = LuaColumn1:AddSection"Lua"
@@ -4028,48 +4064,17 @@ LocalPlayer.Additionals.TotalDamage:GetPropertyChangedSignal("Value"):Connect(fu
     end)()
 end)
 
-
-
-MiscSection:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key", mode = "Toggle", key = "T", callback = function()
-	if library.flags["Freeze Clip"] == true then
-		if library.flags["Freeze Clip Key"] == true then
-			local Freto = Instance.new("Part")
-			Freto.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity
-			Freto.CanCollide = false
-
-			Freto.BottomSurface = Enum.SurfaceType.Smooth
-			Freto.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-			Freto.Name = "Freto"
-			Freto.Size = Vector3.new(30, 1, 30)
-			Freto.TopSurface = Enum.SurfaceType.Smooth
-			Freto.Parent = game:GetService("Workspace")
-			Freto.Transparency = 1
-
-			local Part = Instance.new("Part")
-			Part.CanCollide = false
-			Part.Anchored = true
-			Part.BottomSurface = Enum.SurfaceType.Smooth
-			Part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-			Part.Material = Enum.Material.ForceField
-			Part.Shape = Enum.PartType.Ball
-			Part.Size = Vector3.new(2, 2, 2)
-			Part.TopSurface = Enum.SurfaceType.Smooth
-			Part.Transparency = 0.3
-			Part.Parent = Freto
-			Part.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
-
-			local Weld = Instance.new("Weld", Freto)
-			Weld.Parent = Freto
-			Weld.Part0 = Freto
-			Weld.Part1 = game.Players.LocalPlayer.Character.HumanoidRootPart
-			library:SendNotification(5, "Enabled Freeze Clip")
-		else
-			game.Workspace.Freto:Destroy()
-			library:SendNotification(5, "Disabled Freeze Clip")
-		end
-	end
-end})
-
+MiscSection:AddToggle({text = "Double Tap"})
+local j = getsenv(LocalPlayer.PlayerGui.Client)
+local a5 = j.firebullet
+j.firebullet = function(self, ...)
+local J = {...}
+if J[2] ~= "nixusdt" and library.flags["Double Tap"] then
+	game:GetService("RunService").RenderStepped:wait()
+	a5(nil, "nixusdt")
+end
+return a5(self, unpack(J))
+end
 
 
 local PlayerSection = MiscColumn:AddSection"Players"
@@ -4862,7 +4867,11 @@ end})
 				return __oldNewIndex(self, k, string.gsub(v, LocalPlayer.Name, library.flags["Custom Name"]))
 			elseif (game.IsA(self, "ImageLabel") or game.IsA(self, "ImageButton")) and k == "Image" then
 				if string.find(v, playerId) then
+					if library.flags["Custom Avatar ID"] == "" then
+						return 
+					else
 					return __oldNewIndex(self, k, string.gsub(v, playerId, library.flags["Custom Avatar ID"]))
+				end
 				elseif string.find(v, LocalPlayer.Name) then
 					return __oldNewIndex(self, k, string.gsub(v, LocalPlayer.Name, Players.GetNameFromUserIdAsync(Players, playerId)))
 				end
@@ -4951,10 +4960,6 @@ end})
 	LuaSection:AddDivider("Scripts:")
 
 
-
-
-
-
 MiscSection:AddList({text = "Teleport Point", flag = "teleportpoint", skipflag = true, values = {"CT Spawn", "T Spawn", "Bombsite A", "Bombsite B"}, callback = function(val)
 	if val == "T Spawn" then
         LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.Map.SpawnPoints["BuyArea"].Position + Vector3.new(0, 3, 0))
@@ -5001,6 +5006,185 @@ end
 end
 RunService.RenderStepped:Connect(onStep)
 
+VisualSection:AddToggle({text = "Third Person", flag = "thirdperson"}):AddBind({flag = "thirdpersonkey", key = "X", mode = "Toggle", callback = function(val)
+	if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+		if val then
+			if library.flags["thirdperson"] then
+				LocalPlayer.CameraMaxZoomDistance = 20
+				LocalPlayer.CameraMinZoomDistance = 20
+				LocalPlayer.CameraMaxZoomDistance = 20
+				LocalPlayer.CameraMinZoomDistance = 20
+			else
+				LocalPlayer.CameraMaxZoomDistance = 0
+				LocalPlayer.CameraMinZoomDistance = 0
+				LocalPlayer.CameraMaxZoomDistance = 0
+				LocalPlayer.CameraMinZoomDistance = 0
+			end
+		else
+			LocalPlayer.CameraMaxZoomDistance = 0
+			LocalPlayer.CameraMinZoomDistance = 0
+		end
+	end
+end})
+LocalPlayer:GetPropertyChangedSignal("CameraMinZoomDistance"):Connect(function(current)
+	if library.flags["thirdperson"] then
+		if library.flags["thirdpersonkey"] then
+			if current ~= 20 then
+				LocalPlayer.CameraMinZoomDistance = 20
+			end
+		end
+	end
+end)
+
+local mt = getrawmetatable(game)
+local oldNamecall = mt.__namecall
+local oldIndex = mt.__index
+local oldNewIndex = mt.__newindex
+setreadonly(mt,false)
+mt.__namecall = function(self, ...)
+	local method = getnamecallmethod()
+	local args = {...}
+
+	if method == "SetPrimaryPartCFrame" then
+		if self.Name == "Arms" then
+			if library.flags["thirdperson"] and library.flags["thirdpersonkey"] and LocalPlayer.Character then
+				args[1] = args[1] * CFrame.new(99, 99, 99)
+			end
+		end
+	end
+	return oldNamecall(self, unpack(args))
+end
+
+
+local ExColumn = ExTab:AddColumn()
+local ExColumn1 = ExTab:AddColumn()
+
+local Exploits = ExColumn:AddSection"Exploits"
+
+Exploits:AddToggle({text = "Double Tap", flag = "doubletap"})
+local fire = cbClient.firebullet
+cbClient.firebullet = function(self, ...)
+local J = {...}
+if J[2] ~= "dt" and library.flags["doubletap"] then
+	game:GetService("RunService").RenderStepped:wait()
+	fire(nil, "dt")
+end
+return fire(self, unpack(J))
+end
+
+Exploits:AddToggle({text = "Freeze Clip"}):AddBind({flag = "Freeze Clip Key", mode = "Toggle", key = "T", callback = function()
+	if library.flags["Freeze Clip"] == true then
+		if library.flags["Freeze Clip Key"] == true then
+			local Freto = Instance.new("Part")
+			Freto.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity
+			Freto.CanCollide = false
+
+			Freto.BottomSurface = Enum.SurfaceType.Smooth
+			Freto.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+			Freto.Name = "Freto"
+			Freto.Size = Vector3.new(30, 1, 30)
+			Freto.TopSurface = Enum.SurfaceType.Smooth
+			Freto.Parent = game:GetService("Workspace")
+			Freto.Transparency = 1
+
+			local Part = Instance.new("Part")
+			Part.CanCollide = false
+			Part.Anchored = true
+			Part.BottomSurface = Enum.SurfaceType.Smooth
+			Part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+			Part.Material = Enum.Material.ForceField
+			Part.Shape = Enum.PartType.Ball
+			Part.Size = Vector3.new(2, 2, 2)
+			Part.TopSurface = Enum.SurfaceType.Smooth
+			Part.Transparency = 0.3
+			Part.Parent = Freto
+			Part.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+
+			local Weld = Instance.new("Weld", Freto)
+			Weld.Parent = Freto
+			Weld.Part0 = Freto
+			Weld.Part1 = game.Players.LocalPlayer.Character.HumanoidRootPart
+			library:SendNotification(5, "Enabled Freeze Clip")
+		else
+			game.Workspace.Freto:Destroy()
+			library:SendNotification(5, "Disabled Freeze Clip")
+		end
+	end
+end})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         library:Init()
 
         delay(1, function() library:LoadConfig(tostring(getgenv().autoload)) end)
@@ -5016,3 +5200,5 @@ RunService.RenderStepped:Connect(onStep)
             library.options["Config List"]:AddValue"Default"
             library:LoadConfig"Default"
         end
+
+		

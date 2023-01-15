@@ -2946,6 +2946,8 @@ end})
 			end
 		end
 	end})
+
+return library
 	--LIBRARY END
 	
 	--custom notification thing, library required for this to work

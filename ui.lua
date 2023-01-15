@@ -2819,7 +2819,7 @@ function library:Load(options)
 
     utility.connect(services.RunService.RenderStepped, function()
         while self.open do
-            --local mousepos = services.InputService:GetMouseLocation()
+            local mousepos = services.InputService:GetMouseLocation()
             Cursor.Color = Color3.fromRGB(255,255,255)
             Cursor.PointA = mousepos
             Cursor.PointB = mousepos + Vector2.new(6, 12)

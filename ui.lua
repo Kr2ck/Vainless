@@ -1320,9 +1320,8 @@ function library:Close()
         end
     end
 
-    if self.cursor then
-        self.cursor.Visible = self.open
-    end
+    self.cursor.Visible  = self.open
+    self.cursor1.Visible  = self.open
 end
 
 function library:ChangeThemeOption(option, color)
@@ -1437,6 +1436,7 @@ function library:Unload()
 
     if self.cursor then
         self.cursor:Remove()
+        self.cursor1:Remove()
     end
 
     if self.watermarkobject then
@@ -2767,6 +2767,17 @@ function library:Watermark(str)
     return watermarktypes
 end
 
+function library:AddConnection(connection, name, callback)
+    callback = type(name) == "function" and name or callback
+    connection = connection:connect(callback)
+    if name ~= callback then
+        self.connections[name] = connection
+    else
+        table.insert(self.connections, connection)
+    end
+    return connection
+end
+
 function library:Load(options)
     utility.table(options)
     local name = options.name
@@ -2809,28 +2820,33 @@ function library:Load(options)
         self.extension = extension
     end
 
-    local Cursor = Drawing.new('Triangle');
-    Cursor.Thickness = 1;
-    Cursor.Filled = true;
+    self.cursor = self:Create("Triangle", {
+        Color = Color3.fromRGB(180, 180, 180),
+        Transparency = 0.6,
+    })
+    self.cursor1 = self:Create("Triangle", {
+        Color = Color3.fromRGB(240, 240, 240),
+        Transparency = 0.6,
+    })
 
-    self.cursor = cursor
-
-    services.InputService.MouseIconEnabled = false
-
-    utility.connect(services.RunService.RenderStepped, function()
-        while self.open do
-            local mousepos = services.InputService:GetMouseLocation()
-            Cursor.Color = Color3.fromRGB(255,255,255)
-            Cursor.PointA = mousepos
-            Cursor.PointB = mousepos + Vector2.new(6, 12)
-            Cursor.PointC = mousepos + Vector2.new(6, 12)
-
-            Cursor.Visible = not services.InputService.MouseIconEnabled;
-
-            services.RenderStepped:Wait();
+    self:AddConnection(services.InputService.InputChanged, function(input)
+        if not self.open then return end
+        
+        if input.UserInputType.Name == "MouseMovement" then
+            if self.cursor then
+                local mouse = services.InputService:GetMouseLocation()
+                local MousePos = Vector2.new(mouse.X, mouse.Y)
+                self.cursor.PointA = MousePos
+                self.cursor.PointB = MousePos + Vector2.new(12, 12)
+                self.cursor.PointC = MousePos + Vector2.new(12, 12)
+                self.cursor1.PointA = MousePos
+                self.cursor1.PointB = MousePos + Vector2.new(11, 11)
+                self.cursor1.PointC = MousePos + Vector2.new(11, 11)
+            end
         end
-        Cursor:Remove();
     end)
+
+
 
     local holder = utility.create("Square", {
         Transparency = 0,
